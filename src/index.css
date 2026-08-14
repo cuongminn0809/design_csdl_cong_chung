@@ -1,0 +1,214 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ============================================================
+   Kho CSDLCC — design tokens
+   Nguồn: design_handoff_kho_csdlcc/screens/_ds/.../colors_and_type.css
+   ============================================================ */
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter-VariableFont.ttf") format("truetype-variations"),
+    url("/fonts/Inter-VariableFont.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter-Italic-VariableFont.ttf") format("truetype-variations"),
+    url("/fonts/Inter-Italic-VariableFont.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Neutral scale */
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a3a3a3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  --neutral-950: #0a0a0a;
+
+  /* Accent palettes (badges, charts, status) */
+  --red-50: #fef2f2;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+  --orange-500: #f97316;
+  --orange-600: #ea580c;
+  --amber-400: #fbbf24;
+  --amber-500: #f59e0b;
+  --teal-600: #0d9488;
+  --cyan-900: #164e63;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --violet-500: #a855f7;
+  --violet-600: #9333ea;
+
+  /* Source-system badge colors (README §Design Tokens) */
+  --source-a: #2563eb;
+  --source-b: #ea580c;
+  --source-c: #7c3aed;
+  --source-c1: #0891b2;
+  --source-c2: #d97706;
+
+  /* Job / process status colors */
+  --status-info-fg: #3b82f6;
+  --status-info-bg: #eff6ff;
+  --status-done-fg: #22c55e;
+  --status-done-bg: #f0fdf4;
+  --status-diff-fg: #f97316;
+  --status-diff-bg: #fff7ed;
+  --status-error-fg: #ef4444;
+  --status-error-bg: #fef2f2;
+  --status-pending-fg: #a3a3a3;
+  --status-pending-bg: #f5f5f5;
+  --status-warn-fg: #eab308;
+  --status-warn-bg: #fefce8;
+  --status-cancelled-fg: #d4d4d4;
+
+  /* Semantic */
+  --background: var(--neutral-50);
+  --surface: #ffffff;
+  --surface-muted: var(--neutral-100);
+  --surface-subtle: #f4f4f5;
+
+  --foreground: var(--neutral-950);
+  --foreground-strong: var(--neutral-900);
+  --foreground-muted: var(--neutral-500);
+  --foreground-subtle: var(--neutral-400);
+  --foreground-inverse: var(--neutral-50);
+
+  --border-color: var(--neutral-200);
+  --border-strong: var(--neutral-400);
+  --border-input: var(--neutral-200);
+  --border-focus: var(--neutral-950);
+  --ring-color: rgba(10, 10, 10, 0.18);
+
+  --primary: var(--neutral-900);
+  --primary-foreground: var(--neutral-50);
+  --primary-hover: #2d2d2d;
+
+  --secondary: var(--neutral-100);
+  --secondary-foreground: var(--neutral-900);
+
+  --destructive: var(--red-600);
+  --destructive-foreground: var(--red-50);
+
+  --accent: var(--neutral-100);
+  --accent-foreground: var(--neutral-900);
+
+  --link: var(--blue-600);
+
+  --muted: var(--neutral-100);
+  --muted-foreground: var(--neutral-500);
+
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --input: var(--border-input);
+
+  /* Radii */
+  --radius: 8px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-popover: 0 10px 38px -10px rgba(22, 23, 24, 0.35), 0 10px 20px -15px rgba(22, 23, 24, 0.2);
+  --shadow-focus: 0 0 0 3px rgba(10, 10, 10, 0.1);
+
+  /* Typography */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Motion */
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 240ms;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border-color);
+  --color-input: var(--input);
+  --color-ring: var(--ring-color);
+
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground-strong: var(--foreground-strong);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+  --color-link: var(--link);
+
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-950: var(--neutral-950);
+
+  --radius-xs: calc(var(--radius) - 4px);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-2xl: 16px;
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  border-color: var(--border-color);
+}
