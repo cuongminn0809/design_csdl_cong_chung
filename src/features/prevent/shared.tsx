@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -199,9 +199,61 @@ export function HistoryDialog({ history, onClose }: { history: HistoryEntry[]; o
   )
 }
 
+const FOCUSABLE = "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex=\"-1\"])"
+
 function Overlay({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
+  const rootRef = useRef<HTMLDivElement>(null)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+    const prev = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const focusable = () => [...root.querySelectorAll<HTMLElement>(FOCUSABLE)]
+    focusable()[0]?.focus()
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault()
+        onCloseRef.current()
+        return
+      }
+      if (e.key !== "Tab") return
+      const items = focusable()
+      if (!items.length) { e.preventDefault(); return }
+      const first = items[0]
+      const last = items[items.length - 1]
+      const outside = !root.contains(document.activeElement)
+      if (e.shiftKey && (document.activeElement === first || outside)) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && (document.activeElement === last || outside)) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+    const onFocusIn = (e: FocusEvent) => {
+      if (!root.contains(e.target as Node)) focusable()[0]?.focus()
+    }
+
+    document.addEventListener("keydown", onKeyDown, true)
+    document.addEventListener("focusin", onFocusIn)
+    return () => {
+      document.removeEventListener("keydown", onKeyDown, true)
+      document.removeEventListener("focusin", onFocusIn)
+      prev?.focus()
+    }
+  }, [])
+
   return (
-    <div className="fixed inset-0 z-[140] flex items-center justify-center bg-[rgba(10,10,10,0.5)] p-6" onClick={onClose}>
+    <div
+      ref={rootRef}
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[140] flex items-center justify-center bg-[rgba(10,10,10,0.5)] p-6"
+      onClick={onClose}
+    >
       {children}
     </div>
   )
