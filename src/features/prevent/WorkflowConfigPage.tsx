@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/features/reconciliation/components/Toast"
 import { PageHeader } from "../ingestion/shared"
-import { HistoryDialog } from "./shared"
+import { ConfirmDialog, HistoryDialog } from "./shared"
 import type { HistoryEntry } from "./config"
 
 interface Proc { key: string; title: string; desc: string; direct: string[]; approval: string[] }
@@ -34,19 +34,21 @@ export function WorkflowConfigPage() {
   const [config, setConfig] = useState<Config>(() => structuredClone(DEFAULT_CONFIG))
   const [errors, setErrors] = useState<Record<string, boolean>>({})
   const [history, setHistory] = useState(false)
+  const [confirm, setConfirm] = useState(false)
 
   const toggle = (key: string, which: "direct" | "approval") => {
     setConfig((c) => ({ ...c, [key]: { ...c[key], [which]: !c[key][which] } }))
     setErrors((e) => ({ ...e, [key]: false }))
   }
+  // Bấm "Lưu cấu hình": chạy VR-01 trước, hợp lệ thì mở dialog xác nhận SCR-A.1.1.1-03.
   const save = () => {
-    // VR-01 — không được bỏ chọn cả 2 quy trình con.
     const bad: Record<string, boolean> = {}
     PROCESSES.forEach((p) => { if (!config[p.key].direct && !config[p.key].approval) bad[p.key] = true })
     setErrors(bad)
     if (Object.keys(bad).length) return
-    showToast("Lưu cấu hình quy trình thành công.")
+    setConfirm(true)
   }
+  const doSave = () => { setConfirm(false); showToast("Lưu cấu hình quy trình thành công.") }
   const reset = () => { setConfig(structuredClone(DEFAULT_CONFIG)); setErrors({}); showToast("Đã khôi phục cấu hình mặc định.") }
 
   return (
@@ -88,6 +90,15 @@ export function WorkflowConfigPage() {
       </div>
 
       {history && <HistoryDialog history={MOCK_HISTORY} onClose={() => setHistory(false)} />}
+      {confirm && (
+        <ConfirmDialog
+          title="Xác nhận thay đổi cấu hình quy trình"
+          message="Bạn có chắc chắn muốn thay đổi cấu hình quy trình duyệt thông tin ngăn chặn không?"
+          confirmLabel="Xác nhận"
+          onClose={() => setConfirm(false)}
+          onConfirm={doSave}
+        />
+      )}
     </div>
   )
 }
