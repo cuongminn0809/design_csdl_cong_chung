@@ -37,6 +37,9 @@ import { WorkflowConfigPage } from "@/features/prevent/WorkflowConfigPage"
 import { ReleaseListPage } from "@/features/release/ReleaseListPage"
 import { ReleaseDetailPage } from "@/features/release/ReleaseDetailPage"
 import { ReleaseFormPage } from "@/features/release/ReleaseFormPage"
+import { ExploitSearchPage } from "@/features/exploit/ExploitSearchPage"
+import { ExploitHistoryPage } from "@/features/exploit/ExploitHistoryPage"
+import { DocExploitPage } from "@/features/docexploit/DocExploitPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -73,7 +76,7 @@ const REAL_ROUTES = new Set([
 
 function App() {
   const placeholderRoutes = ALL_ROUTES.filter(
-    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !REAL_ROUTES.has(r.path)
+    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !REAL_ROUTES.has(r.path)
   )
 
   return (
@@ -125,6 +128,9 @@ function App() {
         <Route path="/giai-toa-info/detail/:id" element={<ReleaseDetailPage />} />
         <Route path="/giai-toa-info/create" element={<ReleaseFormPage mode="create" />} />
         <Route path="/giai-toa-info/update/:id" element={<ReleaseFormPage mode="edit" />} />
+        <Route path="/exploit-info/notary-transaction-search" element={<ExploitSearchPage />} />
+        <Route path="/exploit-info/notary-transaction-search/history" element={<ExploitHistoryPage />} />
+        <Route path="/exploit/notary-document" element={<DocExploitPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

@@ -17,7 +17,7 @@ import { NavTree } from "@/components/layout/NavTree"
 /** Phân hệ suy ra từ URL để sidebar bám theo route. */
 function subsystemForPath(pathname: string) {
   if (pathname.startsWith("/quan-tri")) return "quan-tri"
-  if (pathname.startsWith("/notary-transaction") || pathname.startsWith("/prevent-info") || pathname.startsWith("/giai-toa-info")) return "csdlcc"
+  if (pathname.startsWith("/notary-transaction") || pathname.startsWith("/prevent-info") || pathname.startsWith("/giai-toa-info") || pathname.startsWith("/exploit")) return "csdlcc"
   return SUBSYSTEMS[0].code
 }
 
