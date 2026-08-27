@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react"
 import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
-  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode,
+  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -252,6 +252,7 @@ export const SUBSYSTEMS: Subsystem[] = [
         children: [
           { type: "leaf", label: "Văn bản công chứng", path: "/exploit/notary-document", icon: ScrollText },
           { type: "leaf", label: "Tham chiếu VBCCĐT", path: "/reference-vbccdt", icon: QrCode },
+          { type: "leaf", label: "Thông tin tài sản", path: "/asset-exploit/search", icon: Boxes },
         ],
       },
     ],
