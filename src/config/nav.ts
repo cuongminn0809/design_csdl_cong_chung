@@ -253,6 +253,7 @@ export const SUBSYSTEMS: Subsystem[] = [
           { type: "leaf", label: "Văn bản công chứng", path: "/exploit/notary-document", icon: ScrollText },
           { type: "leaf", label: "Tham chiếu VBCCĐT", path: "/reference-vbccdt", icon: QrCode },
           { type: "leaf", label: "Thông tin tài sản", path: "/asset-exploit/search", icon: Boxes },
+          { type: "leaf", label: "Thông tin người tham gia GDCC", path: "/exploit/participant-lookup", icon: Users },
         ],
       },
     ],

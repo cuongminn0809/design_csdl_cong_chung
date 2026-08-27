@@ -50,6 +50,8 @@ import { ReferencePage } from "@/features/reference/ReferencePage"
 import { ViewFilePage } from "@/features/reference/ViewFilePage"
 import { AssetSearchPage } from "@/features/assetexploit/AssetSearchPage"
 import { AssetHistoryPage } from "@/features/assetexploit/AssetHistoryPage"
+import { ParticipantSearchPage } from "@/features/participant/ParticipantSearchPage"
+import { ParticipantHistoryPage } from "@/features/participant/ParticipantHistoryPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -151,6 +153,8 @@ function App() {
         <Route path="/reference-vbccdt/view-file/:id" element={<ViewFilePage />} />
         <Route path="/asset-exploit/search" element={<AssetSearchPage />} />
         <Route path="/asset-exploit/search-history" element={<AssetHistoryPage />} />
+        <Route path="/exploit/participant-lookup" element={<ParticipantSearchPage />} />
+        <Route path="/exploit/participant-lookup/history" element={<ParticipantHistoryPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}
