@@ -222,6 +222,26 @@ export const SUBSYSTEMS: Subsystem[] = [
         defaultOpen: true,
         children: [
           { type: "leaf", label: "Tra cứu phục vụ công chứng", path: "/exploit-info/notary-transaction-search", icon: Search },
+          {
+            type: "group",
+            label: "Công chứng viên và TCHNCC",
+            path: "/tra-cuu/cong-chung-vien-tchncc",
+            icon: Users,
+            defaultOpen: true,
+            children: [
+              { type: "leaf", label: "Lịch sử tra cứu thông tin CCV", path: "/tra-cuu/cong-chung-vien-tchncc/lich-su", icon: History },
+              {
+                type: "group",
+                label: "Tổ chức HNCC",
+                path: "/tra-cuu/cong-chung-vien-tchncc/to-chuc-hncc",
+                icon: Building2,
+                defaultOpen: true,
+                children: [
+                  { type: "leaf", label: "Lịch sử tra cứu thông tin tổ chức HNCC", path: "/tra-cuu/cong-chung-vien-tchncc/to-chuc-hncc/lich-su", icon: History },
+                ],
+              },
+            ],
+          },
         ],
       },
       {

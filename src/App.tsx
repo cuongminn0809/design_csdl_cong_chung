@@ -40,6 +40,12 @@ import { ReleaseFormPage } from "@/features/release/ReleaseFormPage"
 import { ExploitSearchPage } from "@/features/exploit/ExploitSearchPage"
 import { ExploitHistoryPage } from "@/features/exploit/ExploitHistoryPage"
 import { DocExploitPage } from "@/features/docexploit/DocExploitPage"
+import { CcvLookupPage } from "@/features/ccv/CcvLookupPage"
+import { CcvDetailPage } from "@/features/ccv/CcvDetailPage"
+import { CcvHistoryPage } from "@/features/ccv/CcvHistoryPage"
+import { OrgLookupPage } from "@/features/orglookup/OrgLookupPage"
+import { OrgDetailPage } from "@/features/orglookup/OrgDetailPage"
+import { OrgHistoryPage } from "@/features/orglookup/OrgHistoryPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -76,7 +82,7 @@ const REAL_ROUTES = new Set([
 
 function App() {
   const placeholderRoutes = ALL_ROUTES.filter(
-    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !REAL_ROUTES.has(r.path)
+    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !REAL_ROUTES.has(r.path)
   )
 
   return (
@@ -131,6 +137,12 @@ function App() {
         <Route path="/exploit-info/notary-transaction-search" element={<ExploitSearchPage />} />
         <Route path="/exploit-info/notary-transaction-search/history" element={<ExploitHistoryPage />} />
         <Route path="/exploit/notary-document" element={<DocExploitPage />} />
+        <Route path="/tra-cuu/cong-chung-vien-tchncc" element={<CcvLookupPage />} />
+        <Route path="/tra-cuu/cong-chung-vien-tchncc/lich-su" element={<CcvHistoryPage />} />
+        <Route path="/tra-cuu/cong-chung-vien-tchncc/chi-tiet/:id" element={<CcvDetailPage />} />
+        <Route path="/tra-cuu/cong-chung-vien-tchncc/to-chuc-hncc" element={<OrgLookupPage />} />
+        <Route path="/tra-cuu/cong-chung-vien-tchncc/to-chuc-hncc/lich-su" element={<OrgHistoryPage />} />
+        <Route path="/tra-cuu/cong-chung-vien-tchncc/to-chuc-hncc/chi-tiet/:id" element={<OrgDetailPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

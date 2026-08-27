@@ -10,6 +10,7 @@ function findBreadcrumb(items: NavItem[], pathname: string, trail: string[] = []
     if (item.type === "leaf") {
       if (item.path === pathname) return [...trail, item.label]
     } else {
+      if (item.path === pathname) return [...trail, item.label]
       const found = findBreadcrumb(item.children, pathname, [...trail, item.label])
       if (found) return found
     }
