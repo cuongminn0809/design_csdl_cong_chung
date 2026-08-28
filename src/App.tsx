@@ -56,6 +56,11 @@ import { HauKiemDashboardPage } from "@/features/haukiem/HauKiemDashboardPage"
 import { HauKiemListPage } from "@/features/haukiem/HauKiemListPage"
 import { SentPage } from "@/features/exploitreq/SentPage"
 import { ReceivedPage } from "@/features/exploitreq/ReceivedPage"
+import { TongHopSoLuongPage } from "@/features/report/TongHopSoLuongPage"
+import { CanhBaoBatThuongPage } from "@/features/report/CanhBaoBatThuongPage"
+import { SaiLechPage } from "@/features/report/SaiLechPage"
+import { PhanTichDaChieuPage } from "@/features/report/PhanTichDaChieuPage"
+import { BienDongPhapLyPage } from "@/features/report/BienDongPhapLyPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -92,7 +97,7 @@ const REAL_ROUTES = new Set([
 
 function App() {
   const placeholderRoutes = ALL_ROUTES.filter(
-    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !REAL_ROUTES.has(r.path)
+    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !r.path.startsWith("/bao-cao-thong-ke") && !REAL_ROUTES.has(r.path)
   )
 
   return (
@@ -163,6 +168,11 @@ function App() {
         <Route path="/khai-thac-thong-tin/hau-kiem-du-lieu/danh-sach" element={<HauKiemListPage />} />
         <Route path="/exploit-request/sent" element={<SentPage />} />
         <Route path="/exploit-request/received" element={<ReceivedPage />} />
+        <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/tong-hop-so-luong" element={<TongHopSoLuongPage />} />
+        <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/bao-cao-canh-bao-bat-thuong-tru-cap-ho-so-luu-tru" element={<CanhBaoBatThuongPage />} />
+        <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/bao-cao-du-lieu-sai-lech" element={<SaiLechPage />} />
+        <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/phan-tich-da-chieu" element={<PhanTichDaChieuPage />} />
+        <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/bien-dong-phap-ly" element={<BienDongPhapLyPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

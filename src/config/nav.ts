@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react"
 import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
-  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send,
+  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -262,6 +262,27 @@ export const SUBSYSTEMS: Subsystem[] = [
             children: [
               { type: "leaf", label: "Danh sách yêu cầu đã gửi", path: "/exploit-request/sent", icon: Send },
               { type: "leaf", label: "Danh sách yêu cầu nhận được", path: "/exploit-request/received", icon: Inbox },
+            ],
+          },
+        ],
+      },
+      {
+        type: "group",
+        label: "Báo cáo thống kê",
+        icon: BarChart3,
+        defaultOpen: true,
+        children: [
+          {
+            type: "group",
+            label: "Giao dịch công chứng",
+            icon: FileSignature,
+            defaultOpen: true,
+            children: [
+              { type: "leaf", label: "Thống kê tổng hợp số lượng", path: "/bao-cao-thong-ke/giao-dich-cong-chung/tong-hop-so-luong", icon: BarChart3 },
+              { type: "leaf", label: "Cảnh báo bất thường truy cập HSLT", path: "/bao-cao-thong-ke/giao-dich-cong-chung/bao-cao-canh-bao-bat-thuong-tru-cap-ho-so-luu-tru", icon: AlertTriangle },
+              { type: "leaf", label: "Báo cáo dữ liệu sai lệch", path: "/bao-cao-thong-ke/giao-dich-cong-chung/bao-cao-du-lieu-sai-lech", icon: GitCompare },
+              { type: "leaf", label: "Phân tích dữ liệu đa chiều", path: "/bao-cao-thong-ke/giao-dich-cong-chung/phan-tich-da-chieu", icon: PieChart },
+              { type: "leaf", label: "Biến động pháp lý", path: "/bao-cao-thong-ke/giao-dich-cong-chung/bien-dong-phap-ly", icon: Scale },
             ],
           },
         ],
