@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react"
 import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
-  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes,
+  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -255,6 +255,15 @@ export const SUBSYSTEMS: Subsystem[] = [
           { type: "leaf", label: "Thông tin tài sản", path: "/asset-exploit/search", icon: Boxes },
           { type: "leaf", label: "Thông tin người tham gia GDCC", path: "/exploit/participant-lookup", icon: Users },
           { type: "leaf", label: "Hậu kiểm dữ liệu", path: "/khai-thac-thong-tin/hau-kiem-du-lieu", icon: ShieldCheck },
+          {
+            type: "group",
+            label: "Yêu cầu khai thác chi tiết GDCC",
+            icon: Inbox,
+            children: [
+              { type: "leaf", label: "Danh sách yêu cầu đã gửi", path: "/exploit-request/sent", icon: Send },
+              { type: "leaf", label: "Danh sách yêu cầu nhận được", path: "/exploit-request/received", icon: Inbox },
+            ],
+          },
         ],
       },
     ],

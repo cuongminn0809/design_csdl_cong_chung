@@ -54,6 +54,8 @@ import { ParticipantSearchPage } from "@/features/participant/ParticipantSearchP
 import { ParticipantHistoryPage } from "@/features/participant/ParticipantHistoryPage"
 import { HauKiemDashboardPage } from "@/features/haukiem/HauKiemDashboardPage"
 import { HauKiemListPage } from "@/features/haukiem/HauKiemListPage"
+import { SentPage } from "@/features/exploitreq/SentPage"
+import { ReceivedPage } from "@/features/exploitreq/ReceivedPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -90,7 +92,7 @@ const REAL_ROUTES = new Set([
 
 function App() {
   const placeholderRoutes = ALL_ROUTES.filter(
-    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !REAL_ROUTES.has(r.path)
+    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !REAL_ROUTES.has(r.path)
   )
 
   return (
@@ -159,6 +161,8 @@ function App() {
         <Route path="/exploit/participant-lookup/history" element={<ParticipantHistoryPage />} />
         <Route path="/khai-thac-thong-tin/hau-kiem-du-lieu" element={<HauKiemDashboardPage />} />
         <Route path="/khai-thac-thong-tin/hau-kiem-du-lieu/danh-sach" element={<HauKiemListPage />} />
+        <Route path="/exploit-request/sent" element={<SentPage />} />
+        <Route path="/exploit-request/received" element={<ReceivedPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}
