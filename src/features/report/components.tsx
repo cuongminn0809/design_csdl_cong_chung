@@ -63,7 +63,16 @@ export function TimeFilterBar({ time, onTime, extra, error, onApply, onReset }: 
 }
 
 /* ============================ CARD & BIỂU ĐỒ ============================ */
-export function StatCard({ label, value, color = "#2563eb", bg = "#eff6ff", icon }: { label: string; value: number; color?: string; bg?: string; icon?: React.ReactNode }) {
+export function StatCard({ label, value, color = "#2563eb", bg = "#eff6ff", icon, hero }: { label: string; value: number; color?: string; bg?: string; icon?: React.ReactNode; hero?: boolean }) {
+  if (hero) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-2.5 rounded-[14px] border border-border bg-surface p-6 text-center shadow-sm">
+        {icon && <div className="flex size-14 items-center justify-center rounded-2xl" style={{ background: bg, color }}>{icon}</div>}
+        <div className="text-[42px] font-bold leading-none tabular-nums" style={{ color }}>{value.toLocaleString("vi-VN")}</div>
+        <div className="text-[13px] font-medium text-foreground-muted">{label}</div>
+      </div>
+    )
+  }
   return (
     <div className="flex items-center gap-3 rounded-[14px] border border-border bg-surface p-4 shadow-sm">
       {icon && <div className="flex size-11 items-center justify-center rounded-xl" style={{ background: bg, color }}>{icon}</div>}
@@ -80,8 +89,8 @@ export function DonutChart({ title, segments }: { title: string; segments: { lab
   return (
     <div className="rounded-[14px] border border-border bg-surface p-4 shadow-sm">
       <div className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-foreground-subtle">{title}</div>
-      <div className="flex items-center gap-4">
-        <svg viewBox="0 0 140 140" className="size-[132px] shrink-0">
+      <div className="flex items-center gap-3">
+        <svg viewBox="0 0 140 140" className="size-[112px] shrink-0">
           <circle cx="70" cy="70" r={R} fill="none" stroke="#f1f5f9" strokeWidth="16" />
           {total > 0 && segments.map((s, i) => {
             const len = (s.value / total) * C; const off = acc; acc += len
@@ -90,12 +99,12 @@ export function DonutChart({ title, segments }: { title: string; segments: { lab
           <text x="70" y="66" textAnchor="middle" className="fill-foreground-strong" style={{ fontSize: 20, fontWeight: 700 }}>{total.toLocaleString("vi-VN")}</text>
           <text x="70" y="84" textAnchor="middle" className="fill-foreground-muted" style={{ fontSize: 9 }}>giao dịch</text>
         </svg>
-        <div className="flex-1 space-y-1.5">
+        <div className="min-w-0 flex-1 space-y-2">
           {segments.map((s, i) => (
-            <div key={i} className="flex items-center gap-2 text-[12px]">
-              <span className="size-2.5 shrink-0 rounded-sm" style={{ background: PALETTE[i % PALETTE.length] }} />
-              <span className="flex-1 truncate text-foreground-muted">{s.label}</span>
-              <span className="font-semibold tabular-nums text-foreground-strong">{s.pct}%</span>
+            <div key={i} className="flex items-start gap-2 text-[11.5px]">
+              <span className="mt-1 size-2.5 shrink-0 rounded-sm" style={{ background: PALETTE[i % PALETTE.length] }} />
+              <span className="min-w-0 flex-1 leading-snug text-foreground-muted">{s.label}</span>
+              <span className="shrink-0 font-semibold tabular-nums text-foreground-strong">{s.pct}%</span>
             </div>
           ))}
         </div>

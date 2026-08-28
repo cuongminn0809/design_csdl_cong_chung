@@ -69,7 +69,7 @@ export function TongHopSoLuongPage() {
       />
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-        <StatCard label="Tổng số giao dịch" value={rows.length} icon={<Layers className="size-5" />} />
+        <StatCard label="Tổng số giao dịch" value={rows.length} icon={<Layers className="size-6" />} hero />
         <DonutChart title="Tỉ lệ theo nguồn dữ liệu" segments={srcDist} />
         <DonutChart title="Thống kê theo phương thức công chứng" segments={methodDist} />
       </div>
