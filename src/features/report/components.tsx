@@ -6,14 +6,14 @@ import { NativeSelect } from "@/features/reconciliation/components/NativeSelect"
 import { PageHeader, Pagination, Th, inputCls } from "../ingestion/shared"
 import { REPORT_ROLES, YEARS, resolveRange, type ReportRole, type TimeState } from "./config"
 
-export function ReportHeader({ title, desc, role, onRole }: { title: string; desc: string; role: ReportRole; onRole: (r: ReportRole) => void }) {
+export function ReportHeader({ title, desc, role, onRole, roles = REPORT_ROLES }: { title: string; desc: string; role: ReportRole; onRole: (r: ReportRole) => void; roles?: { key: ReportRole; label: string }[] }) {
   return (
     <PageHeader title={title} desc={desc}
       actions={
         <div className="flex items-center gap-2">
           <span className="text-[12.5px] text-foreground-muted">Vai trò:</span>
           <NativeSelect value={role} onChange={(e) => onRole(e.target.value as ReportRole)} className="h-8 w-[210px] text-[12.5px]">
-            {REPORT_ROLES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
+            {roles.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
           </NativeSelect>
         </div>
       }

@@ -285,6 +285,16 @@ export const SUBSYSTEMS: Subsystem[] = [
               { type: "leaf", label: "Biến động pháp lý", path: "/bao-cao-thong-ke/giao-dich-cong-chung/bien-dong-phap-ly", icon: Scale },
             ],
           },
+          {
+            type: "group",
+            label: "Ngăn chặn & Cảnh báo rủi ro",
+            icon: ShieldAlert,
+            defaultOpen: true,
+            children: [
+              { type: "leaf", label: "Thống kê ngăn chặn / CBRR", path: "/bao-cao-thong-ke/ngan-chan-cbrr/thong-ke", icon: ShieldAlert },
+              { type: "leaf", label: "Tình hình khai thác", path: "/bao-cao-thong-ke/ngan-chan-cbrr/tinh-hinh-khai-thac", icon: BarChart3 },
+            ],
+          },
         ],
       },
     ],
