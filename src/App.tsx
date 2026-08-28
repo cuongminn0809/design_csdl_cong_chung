@@ -52,6 +52,8 @@ import { AssetSearchPage } from "@/features/assetexploit/AssetSearchPage"
 import { AssetHistoryPage } from "@/features/assetexploit/AssetHistoryPage"
 import { ParticipantSearchPage } from "@/features/participant/ParticipantSearchPage"
 import { ParticipantHistoryPage } from "@/features/participant/ParticipantHistoryPage"
+import { HauKiemDashboardPage } from "@/features/haukiem/HauKiemDashboardPage"
+import { HauKiemListPage } from "@/features/haukiem/HauKiemListPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -88,7 +90,7 @@ const REAL_ROUTES = new Set([
 
 function App() {
   const placeholderRoutes = ALL_ROUTES.filter(
-    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !REAL_ROUTES.has(r.path)
+    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !REAL_ROUTES.has(r.path)
   )
 
   return (
@@ -155,6 +157,8 @@ function App() {
         <Route path="/asset-exploit/search-history" element={<AssetHistoryPage />} />
         <Route path="/exploit/participant-lookup" element={<ParticipantSearchPage />} />
         <Route path="/exploit/participant-lookup/history" element={<ParticipantHistoryPage />} />
+        <Route path="/khai-thac-thong-tin/hau-kiem-du-lieu" element={<HauKiemDashboardPage />} />
+        <Route path="/khai-thac-thong-tin/hau-kiem-du-lieu/danh-sach" element={<HauKiemListPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}
