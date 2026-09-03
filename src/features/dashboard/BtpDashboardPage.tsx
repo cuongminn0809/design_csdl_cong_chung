@@ -208,10 +208,10 @@ export function BtpDashboardPage() {
 
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           <ChartCard title="Xu hướng giao dịch bị hủy (B11)" onExport={() => doExport("XuHuongBiHuy")} onToggle={b11.toggle} toggleLabel={b11.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-            <LineOrArea categories={buckets.map((b) => b.label)} series={b11Series} mode={b11.mode} yLabel="Số lượng GDCC bị hủy" />
+            <LineOrArea categories={buckets.map((b) => b.label)} series={b11Series} mode={b11.mode} yLabel="Số lượng GDCC bị hủy" width={400} />
           </ChartCard>
           <ChartCard title="Xu hướng giao dịch bị tuyên vô hiệu (B12)" onExport={() => doExport("XuHuongVoHieu")} onToggle={b12.toggle} toggleLabel={b12.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-            <LineOrArea categories={buckets.map((b) => b.label)} series={b12Series} mode={b12.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" />
+            <LineOrArea categories={buckets.map((b) => b.label)} series={b12Series} mode={b12.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={400} />
           </ChartCard>
         </div>
       </AccessGate>

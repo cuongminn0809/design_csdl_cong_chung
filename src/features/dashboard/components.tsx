@@ -136,8 +136,8 @@ function YTicks({ W, H, maxV }: { W: number; H: number; maxV: number }) {
 }
 
 /* ============================ B02/B07/B08/B11/B12: ĐƯỜNG ↔ VÙNG (1 hoặc nhiều series) ============================ */
-export function LineOrArea({ categories, series, mode, xLabel = "Thời gian", yLabel = "Số lượng" }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "area"; xLabel?: string; yLabel?: string }) {
-  const W = 760, H = 240
+export function LineOrArea({ categories, series, mode, xLabel = "Thời gian", yLabel = "Số lượng", width = 760 }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "area"; xLabel?: string; yLabel?: string; width?: number }) {
+  const W = width, H = 240
   const n = categories.length
   const maxV = Math.max(1, ...series.flatMap((s) => s.data)) * 1.1
   const x = (i: number) => AXIS_PAD.left + (i * (W - AXIS_PAD.left - AXIS_PAD.right)) / (Math.max(n, 2) - 1)
