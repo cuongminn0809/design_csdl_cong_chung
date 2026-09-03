@@ -46,17 +46,21 @@ export const DEFAULT_TIME: TimeState = { year: CURRENT_YEAR, kind: "ca-nam", mon
 
 // D-2 (độ trễ chuẩn hóa). Hôm nay 28/08/2026 → 26/08/2026.
 export const D_MINUS_2 = "2026-08-26"
+export const TODAY_ISO = "2026-08-28"
 const pad = (n: number) => String(n).padStart(2, "0")
 const lastDay = (y: number, m: number) => new Date(y, m, 0).getDate()
 export const fmtVN = (iso: string) => { const [y, m, d] = iso.split("-"); return `${d}/${m}/${y}` }
 
 export interface ResolvedRange { from: string; to: string; label: string; error?: string }
-export function resolveRange(t: TimeState): ResolvedRange {
-  const capTo = (to: string, year: number) => (year === CURRENT_YEAR && to > D_MINUS_2 ? D_MINUS_2 : to)
+// capMode "d2" (mặc định, A.6.1.x): Đến ngày <= D-2. "today" (A.6.3): Đến ngày <= Ngày hiện tại.
+export function resolveRange(t: TimeState, capMode: "d2" | "today" = "d2"): ResolvedRange {
+  const cap = capMode === "today" ? TODAY_ISO : D_MINUS_2
+  const capMsg = capMode === "today" ? "Thời gian từ ngày không được lớn hơn đến ngày và đến ngày không được vượt quá ngày hiện tại. Vui lòng kiểm tra lại." : "Ngày kết thúc không được vượt quá ngày hiện tại - 2 (D-2). Vui lòng kiểm tra lại."
+  const capTo = (to: string, year: number) => (year === CURRENT_YEAR && to > cap ? cap : to)
   if (t.year === "custom") {
     if (!t.tuNgay || !t.denNgay) return { from: t.tuNgay, to: t.denNgay, label: "Chưa chọn đủ khoảng thời gian", error: "" }
     if (t.tuNgay > t.denNgay) return { from: t.tuNgay, to: t.denNgay, label: "", error: "Thời gian từ ngày không được lớn hơn đến ngày. Vui lòng kiểm tra lại." }
-    if (t.denNgay > D_MINUS_2) return { from: t.tuNgay, to: t.denNgay, label: "", error: "Ngày kết thúc không được vượt quá ngày hiện tại - 2 (D-2). Vui lòng kiểm tra lại." }
+    if (t.denNgay > cap) return { from: t.tuNgay, to: t.denNgay, label: "", error: capMsg }
     return { from: t.tuNgay, to: t.denNgay, label: `Từ ${fmtVN(t.tuNgay)} đến ${fmtVN(t.denNgay)}` }
   }
   const y = t.year

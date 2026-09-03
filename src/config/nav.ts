@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react"
 import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
-  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare,
+  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -295,6 +295,7 @@ export const SUBSYSTEMS: Subsystem[] = [
               { type: "leaf", label: "Tình hình khai thác", path: "/bao-cao-thong-ke/ngan-chan-cbrr/tinh-hinh-khai-thac", icon: BarChart3 },
             ],
           },
+          { type: "leaf", label: "Đối soát lịch sử tra cứu", path: "/bao-cao-thong-ke/doi-soat-lich-su-tra-cuu", icon: ClipboardList },
         ],
       },
     ],

@@ -143,6 +143,26 @@ export function BarChart({ title, bars, horizontal }: { title: string; bars: { l
   )
 }
 
+/** Thanh tỷ lệ trạng thái 3 màu (BR-A6-06): Xanh lá/Xám/Đỏ + Legend. */
+export function TriStatusBar({ title, segments }: { title?: string; segments: { label: string; value: number; pct: number; color: string }[] }) {
+  return (
+    <div className="rounded-[14px] border border-border bg-surface p-4 shadow-sm">
+      {title && <div className="mb-3 flex items-center gap-1.5 text-[12.5px] font-semibold text-foreground-strong"><Clock className="size-3.5 text-foreground-muted" />{title}</div>}
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-neutral-100">
+        {segments.map((s, i) => s.pct > 0 && <div key={i} style={{ width: `${s.pct}%`, background: s.color }} />)}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-[12.5px]">
+        {segments.map((s, i) => (
+          <span key={i} className="inline-flex items-center gap-1.5 text-foreground-muted">
+            <span className="size-2.5 rounded-full" style={{ background: s.color }} />
+            {s.label} <span className="font-semibold text-foreground-strong">{s.value}</span> ({s.pct}%)
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /* ============================ BẢNG BÁO CÁO ============================ */
 export function ReportTable<T>({ title, rows, columns, onExport, page, pageSize, onPage, onPageSize }: {
   title: string; rows: T[]; columns: { key: string; header: string; cell: (r: T, i: number) => React.ReactNode; className?: string }[]

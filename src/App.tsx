@@ -63,6 +63,7 @@ import { PhanTichDaChieuPage } from "@/features/report/PhanTichDaChieuPage"
 import { BienDongPhapLyPage } from "@/features/report/BienDongPhapLyPage"
 import { NganChanReportPage } from "@/features/report/NganChanReportPage"
 import { KhaiThacReportPage } from "@/features/report/KhaiThacReportPage"
+import { DoiSoatTraCuuPage } from "@/features/report/DoiSoatTraCuuPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -177,6 +178,7 @@ function App() {
         <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/bien-dong-phap-ly" element={<BienDongPhapLyPage />} />
         <Route path="/bao-cao-thong-ke/ngan-chan-cbrr/thong-ke" element={<NganChanReportPage />} />
         <Route path="/bao-cao-thong-ke/ngan-chan-cbrr/tinh-hinh-khai-thac" element={<KhaiThacReportPage />} />
+        <Route path="/bao-cao-thong-ke/doi-soat-lich-su-tra-cuu" element={<DoiSoatTraCuuPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}
