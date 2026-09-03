@@ -113,46 +113,71 @@ export function PieOrBar({ data, mode }: { data: { label: string; value: number;
   )
 }
 
+// Padding chung cho khung biểu đồ đường/cột theo thời gian: chừa chỗ cho nhãn số trục Oy + tiêu đề 2 trục.
+const AXIS_PAD = { left: 50, right: 16, top: 16, bottom: 42 }
+function AxisTitles({ W, H, xLabel, yLabel }: { W: number; H: number; xLabel: string; yLabel: string }) {
+  return (
+    <>
+      <text x={(AXIS_PAD.left + (W - AXIS_PAD.right)) / 2} y={H - 6} textAnchor="middle" fontSize={10.5} fontWeight={600} fill="#71717a">{xLabel}</text>
+      <text x={12} y={(AXIS_PAD.top + (H - AXIS_PAD.bottom)) / 2} textAnchor="middle" fontSize={10.5} fontWeight={600} fill="#71717a" transform={`rotate(-90 12 ${(AXIS_PAD.top + (H - AXIS_PAD.bottom)) / 2})`}>{yLabel}</text>
+    </>
+  )
+}
+function YTicks({ W, H, maxV }: { W: number; H: number; maxV: number }) {
+  return <>{[0, 0.25, 0.5, 0.75, 1].map((f, i) => {
+    const yy = AXIS_PAD.top + f * (H - AXIS_PAD.top - AXIS_PAD.bottom)
+    return (
+      <g key={i}>
+        <line x1={AXIS_PAD.left} x2={W - AXIS_PAD.right} y1={yy} y2={yy} stroke="#f1f5f9" strokeWidth={1} />
+        <text x={AXIS_PAD.left - 8} y={yy + 3} textAnchor="end" fontSize={9} fill="#a3a3a3">{fmt(Math.round(maxV * (1 - f)))}</text>
+      </g>
+    )
+  })}</>
+}
+
 /* ============================ B02/B07/B08/B11/B12: ĐƯỜNG ↔ VÙNG (1 hoặc nhiều series) ============================ */
-export function LineOrArea({ categories, series, mode }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "area" }) {
-  const W = 760, H = 220, pad = 34
+export function LineOrArea({ categories, series, mode, xLabel = "Thời gian", yLabel = "Số lượng" }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "area"; xLabel?: string; yLabel?: string }) {
+  const W = 760, H = 240
   const n = categories.length
   const maxV = Math.max(1, ...series.flatMap((s) => s.data)) * 1.1
-  const x = (i: number) => pad + (i * (W - pad * 2)) / (Math.max(n, 2) - 1)
-  const y = (v: number) => H - pad - (v / maxV) * (H - pad * 2)
+  const x = (i: number) => AXIS_PAD.left + (i * (W - AXIS_PAD.left - AXIS_PAD.right)) / (Math.max(n, 2) - 1)
+  const y = (v: number) => (H - AXIS_PAD.bottom) - (v / maxV) * (H - AXIS_PAD.top - AXIS_PAD.bottom)
   const step = Math.max(1, Math.ceil(n / 10))
-  if (!n || series.every((s) => s.data.every((v) => v === 0))) return <div className="flex h-[220px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
+  if (!n || series.every((s) => s.data.every((v) => v === 0))) return <div className="flex h-[240px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
-      {[0, 0.25, 0.5, 0.75, 1].map((f, i) => <line key={i} x1={pad} x2={W - pad} y1={pad + f * (H - pad * 2)} y2={pad + f * (H - pad * 2)} stroke="#f1f5f9" strokeWidth={1} />)}
+      <YTicks W={W} H={H} maxV={maxV} />
       {series.map((s) => {
         const pts = s.data.map((v, i) => `${x(i)},${y(v)}`).join(" ")
         return (
           <g key={s.name}>
-            {mode === "area" && <polygon points={`${pad},${H - pad} ${pts} ${x(n - 1)},${H - pad}`} fill={s.color} opacity={0.12} />}
+            {mode === "area" && <polygon points={`${AXIS_PAD.left},${H - AXIS_PAD.bottom} ${pts} ${x(n - 1)},${H - AXIS_PAD.bottom}`} fill={s.color} opacity={0.12} />}
             <polyline points={pts} fill="none" stroke={s.color} strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round" />
             {s.data.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={2.75} fill="#fff" stroke={s.color} strokeWidth={2}><title>{`${s.name} — ${categories[i]}: ${fmt(v)}`}</title></circle>)}
           </g>
         )
       })}
-      {categories.map((l, i) => (i % step === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+      {categories.map((l, i) => (i % step === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - AXIS_PAD.bottom + 16} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+      <AxisTitles W={W} H={H} xLabel={xLabel} yLabel={yLabel} />
     </svg>
   )
 }
 
 /* ============================ B09/B10: ĐƯỜNG NHIỀU SERIES ↔ CỘT XẾP CHỒNG ============================ */
-export function LineOrStackedBar({ categories, series, mode }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "stackedBar" }) {
-  if (mode === "line") return <LineOrArea categories={categories} series={series} mode="line" />
-  const W = 760, H = 220, pad = 34
+export function LineOrStackedBar({ categories, series, mode, xLabel = "Thời gian", yLabel = "Số lượng" }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "stackedBar"; xLabel?: string; yLabel?: string }) {
+  if (mode === "line") return <LineOrArea categories={categories} series={series} mode="line" xLabel={xLabel} yLabel={yLabel} />
+  const W = 760, H = 240
   const n = categories.length
   const totals = categories.map((_, i) => series.reduce((s, ser) => s + ser.data[i], 0))
   const maxV = Math.max(1, ...totals) * 1.1
-  const bw = Math.min(36, (W - pad * 2) / Math.max(n, 1) - 8)
-  const x = (i: number) => pad + (i * (W - pad * 2)) / Math.max(n, 1) + ((W - pad * 2) / Math.max(n, 1) - bw) / 2
-  const y = (v: number) => H - pad - (v / maxV) * (H - pad * 2)
-  if (!n || totals.every((t) => t === 0)) return <div className="flex h-[220px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
+  const innerW = W - AXIS_PAD.left - AXIS_PAD.right
+  const bw = Math.min(36, innerW / Math.max(n, 1) - 8)
+  const x = (i: number) => AXIS_PAD.left + (i * innerW) / Math.max(n, 1) + (innerW / Math.max(n, 1) - bw) / 2
+  const y = (v: number) => (H - AXIS_PAD.bottom) - (v / maxV) * (H - AXIS_PAD.top - AXIS_PAD.bottom)
+  if (!n || totals.every((t) => t === 0)) return <div className="flex h-[240px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
+      <YTicks W={W} H={H} maxV={maxV} />
       {categories.map((_, i) => {
         let acc = 0
         return series.map((s) => {
@@ -162,7 +187,8 @@ export function LineOrStackedBar({ categories, series, mode }: { categories: str
           return <rect key={s.name} x={x(i)} y={yTop} width={bw} height={Math.max(0, yBottom - yTop)} fill={s.color}><title>{`${s.name} — ${categories[i]}: ${fmt(v)}`}</title></rect>
         })
       })}
-      {categories.map((l, i) => <text key={i} x={x(i) + bw / 2} y={H - 8} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+      {categories.map((l, i) => <text key={i} x={x(i) + bw / 2} y={H - AXIS_PAD.bottom + 16} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+      <AxisTitles W={W} H={H} xLabel={xLabel} yLabel={yLabel} />
     </svg>
   )
 }

@@ -176,7 +176,7 @@ export function BtpDashboardPage() {
 
         <ChartCard title="Thống kê giao dịch công chứng điện tử (B02)" onExport={() => doExport("GDCCDienTu")} onToggle={b02.toggle} toggleLabel={b02.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}
           legend={b02Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-          <LineOrArea categories={buckets.map((b) => b.label)} series={b02Series} mode={b02.mode} />
+          <LineOrArea categories={buckets.map((b) => b.label)} series={b02Series} mode={b02.mode} yLabel="Số lượng GDCC điện tử" />
         </ChartCard>
 
         <ChartCard title="Tình hình khai thác dữ liệu theo loại dữ liệu (B03)" onExport={() => doExport("KhaiThacTheoLoai")} onToggle={b03.toggle} toggleLabel={b03.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}>
@@ -189,29 +189,29 @@ export function BtpDashboardPage() {
 
         <ChartCard title="Xu hướng khai thác dữ liệu theo đơn vị (B07)" onExport={() => doExport("XuHuongKhaiThacDonVi")} onToggle={b07.toggle} toggleLabel={b07.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}
           legend={b07Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-          <LineOrArea categories={buckets.map((b) => b.label)} series={b07Series} mode={b07.mode} />
+          <LineOrArea categories={buckets.map((b) => b.label)} series={b07Series} mode={b07.mode} yLabel="Số lượt khai thác" />
         </ChartCard>
 
         <ChartCard title="Xu hướng giao dịch theo thời gian (B08)" onExport={() => doExport("XuHuongGiaoDich")} onToggle={b08.toggle} toggleLabel={b08.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-          <LineOrArea categories={buckets.map((b) => b.label)} series={b08Series} mode={b08.mode} />
+          <LineOrArea categories={buckets.map((b) => b.label)} series={b08Series} mode={b08.mode} yLabel="Tổng số GDCC" />
         </ChartCard>
 
         <ChartCard title="Xu hướng giao dịch theo loại giao dịch (B09)" onExport={() => doExport("XuHuongTheoLoaiGD")} onToggle={b09.toggle} toggleLabel={b09.mode === "line" ? "Xem cột xếp chồng" : "Xem dạng đường"}
           legend={b09Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-          <LineOrStackedBar categories={buckets.map((b) => b.label)} series={b09Series} mode={b09.mode} />
+          <LineOrStackedBar categories={buckets.map((b) => b.label)} series={b09Series} mode={b09.mode} yLabel="Số lượng GDCC" />
         </ChartCard>
 
         <ChartCard title="Xu hướng ngăn chặn theo loại tài sản (B10)" onExport={() => doExport("XuHuongNganChan")} onToggle={b10.toggle} toggleLabel={b10.mode === "line" ? "Xem cột xếp chồng" : "Xem dạng đường"}
           legend={b10Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-          <LineOrStackedBar categories={buckets.map((b) => b.label)} series={b10Series} mode={b10.mode} />
+          <LineOrStackedBar categories={buckets.map((b) => b.label)} series={b10Series} mode={b10.mode} yLabel="Số lượng ngăn chặn" />
         </ChartCard>
 
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           <ChartCard title="Xu hướng giao dịch bị hủy (B11)" onExport={() => doExport("XuHuongBiHuy")} onToggle={b11.toggle} toggleLabel={b11.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-            <LineOrArea categories={buckets.map((b) => b.label)} series={b11Series} mode={b11.mode} />
+            <LineOrArea categories={buckets.map((b) => b.label)} series={b11Series} mode={b11.mode} yLabel="Số lượng GDCC bị hủy" />
           </ChartCard>
           <ChartCard title="Xu hướng giao dịch bị tuyên vô hiệu (B12)" onExport={() => doExport("XuHuongVoHieu")} onToggle={b12.toggle} toggleLabel={b12.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-            <LineOrArea categories={buckets.map((b) => b.label)} series={b12Series} mode={b12.mode} />
+            <LineOrArea categories={buckets.map((b) => b.label)} series={b12Series} mode={b12.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" />
           </ChartCard>
         </div>
       </AccessGate>
