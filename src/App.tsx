@@ -68,6 +68,13 @@ import { MinistryReportPage } from "@/features/reportTT17/MinistryReportPage"
 import { DepartmentReportPage } from "@/features/reportTT17/DepartmentReportPage"
 import { NotaryOrgReportPage } from "@/features/reportTT17/NotaryOrgReportPage"
 import { AnalysisHistoryPage } from "@/features/reportTT17/AnalysisHistoryPage"
+import { SystemMonitoringPage } from "@/features/adminReport/SystemMonitoringPage"
+import { DataExploitationPage } from "@/features/adminReport/DataExploitationPage"
+import { DataCollectionPage } from "@/features/adminReport/DataCollectionPage"
+import { DataCleansingPage } from "@/features/adminReport/DataCleansingPage"
+import { DataNormalizationPage } from "@/features/adminReport/DataNormalizationPage"
+import { DataReconciliationPage } from "@/features/adminReport/DataReconciliationPage"
+import { DataPostcheckPage } from "@/features/adminReport/DataPostcheckPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -104,7 +111,7 @@ const REAL_ROUTES = new Set([
 
 function App() {
   const placeholderRoutes = ALL_ROUTES.filter(
-    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !r.path.startsWith("/bao-cao-thong-ke") && !r.path.startsWith("/report-tt17") && !REAL_ROUTES.has(r.path)
+    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !r.path.startsWith("/bao-cao-thong-ke") && !r.path.startsWith("/report-tt17") && !r.path.startsWith("/admin-report") && !REAL_ROUTES.has(r.path)
   )
 
   return (
@@ -187,6 +194,13 @@ function App() {
         <Route path="/report-tt17/department" element={<DepartmentReportPage />} />
         <Route path="/report-tt17/notary-org" element={<NotaryOrgReportPage />} />
         <Route path="/report-tt17/analysis-history" element={<AnalysisHistoryPage />} />
+        <Route path="/admin-report/system-monitoring" element={<SystemMonitoringPage />} />
+        <Route path="/admin-report/data-exploitation" element={<DataExploitationPage />} />
+        <Route path="/admin-report/data-collection" element={<DataCollectionPage />} />
+        <Route path="/admin-report/data-cleansing" element={<DataCleansingPage />} />
+        <Route path="/admin-report/data-normalization" element={<DataNormalizationPage />} />
+        <Route path="/admin-report/data-reconciliation" element={<DataReconciliationPage />} />
+        <Route path="/admin-report/data-postcheck" element={<DataPostcheckPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react"
 import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
   LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList, FileSpreadsheet, Landmark,
+  Activity, Server, DownloadCloud, SprayCan, Wand2, GitMerge, SearchCheck,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -306,6 +307,20 @@ export const SUBSYSTEMS: Subsystem[] = [
               { type: "leaf", label: "Cấp Sở Tư pháp", path: "/report-tt17/department", icon: Building2 },
               { type: "leaf", label: "Cấp TCHNCC", path: "/report-tt17/notary-org", icon: Users },
               { type: "leaf", label: "Phân tích & Lịch sử", path: "/report-tt17/analysis-history", icon: BarChart3 },
+            ],
+          },
+          {
+            type: "group",
+            label: "Báo cáo dành cho Quản trị hệ thống",
+            icon: Server,
+            children: [
+              { type: "leaf", label: "Giám sát hệ thống", path: "/admin-report/system-monitoring", icon: Activity },
+              { type: "leaf", label: "Khai thác dữ liệu", path: "/admin-report/data-exploitation", icon: DownloadCloud },
+              { type: "leaf", label: "Thu thập dữ liệu", path: "/admin-report/data-collection", icon: Database },
+              { type: "leaf", label: "Làm sạch dữ liệu", path: "/admin-report/data-cleansing", icon: SprayCan },
+              { type: "leaf", label: "Chuẩn hóa dữ liệu", path: "/admin-report/data-normalization", icon: Wand2 },
+              { type: "leaf", label: "Đối soát dữ liệu", path: "/admin-report/data-reconciliation", icon: GitMerge },
+              { type: "leaf", label: "Hậu kiểm dữ liệu", path: "/admin-report/data-postcheck", icon: SearchCheck },
             ],
           },
         ],
