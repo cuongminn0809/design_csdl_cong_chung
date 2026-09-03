@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react"
 import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
-  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList,
+  LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList, FileSpreadsheet, Landmark,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -296,6 +296,18 @@ export const SUBSYSTEMS: Subsystem[] = [
             ],
           },
           { type: "leaf", label: "Đối soát lịch sử tra cứu", path: "/bao-cao-thong-ke/doi-soat-lich-su-tra-cuu", icon: ClipboardList },
+          {
+            type: "group",
+            label: "BC kết quả HĐCC theo TT17",
+            icon: FileSpreadsheet,
+            defaultOpen: true,
+            children: [
+              { type: "leaf", label: "Cấp Bộ Tư pháp", path: "/report-tt17/ministry", icon: Landmark },
+              { type: "leaf", label: "Cấp Sở Tư pháp", path: "/report-tt17/department", icon: Building2 },
+              { type: "leaf", label: "Cấp TCHNCC", path: "/report-tt17/notary-org", icon: Users },
+              { type: "leaf", label: "Phân tích & Lịch sử", path: "/report-tt17/analysis-history", icon: BarChart3 },
+            ],
+          },
         ],
       },
     ],

@@ -64,6 +64,10 @@ import { BienDongPhapLyPage } from "@/features/report/BienDongPhapLyPage"
 import { NganChanReportPage } from "@/features/report/NganChanReportPage"
 import { KhaiThacReportPage } from "@/features/report/KhaiThacReportPage"
 import { DoiSoatTraCuuPage } from "@/features/report/DoiSoatTraCuuPage"
+import { MinistryReportPage } from "@/features/reportTT17/MinistryReportPage"
+import { DepartmentReportPage } from "@/features/reportTT17/DepartmentReportPage"
+import { NotaryOrgReportPage } from "@/features/reportTT17/NotaryOrgReportPage"
+import { AnalysisHistoryPage } from "@/features/reportTT17/AnalysisHistoryPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -100,7 +104,7 @@ const REAL_ROUTES = new Set([
 
 function App() {
   const placeholderRoutes = ALL_ROUTES.filter(
-    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !r.path.startsWith("/bao-cao-thong-ke") && !REAL_ROUTES.has(r.path)
+    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !r.path.startsWith("/bao-cao-thong-ke") && !r.path.startsWith("/report-tt17") && !REAL_ROUTES.has(r.path)
   )
 
   return (
@@ -179,6 +183,10 @@ function App() {
         <Route path="/bao-cao-thong-ke/ngan-chan-cbrr/thong-ke" element={<NganChanReportPage />} />
         <Route path="/bao-cao-thong-ke/ngan-chan-cbrr/tinh-hinh-khai-thac" element={<KhaiThacReportPage />} />
         <Route path="/bao-cao-thong-ke/doi-soat-lich-su-tra-cuu" element={<DoiSoatTraCuuPage />} />
+        <Route path="/report-tt17/ministry" element={<MinistryReportPage />} />
+        <Route path="/report-tt17/department" element={<DepartmentReportPage />} />
+        <Route path="/report-tt17/notary-org" element={<NotaryOrgReportPage />} />
+        <Route path="/report-tt17/analysis-history" element={<AnalysisHistoryPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

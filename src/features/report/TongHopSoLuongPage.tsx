@@ -3,7 +3,7 @@ import { Layers } from "lucide-react"
 
 import { useToast } from "@/features/reconciliation/components/Toast"
 import { MultiSelect } from "@/features/reconciliation/components/MultiSelect"
-import { BarChart, DonutChart, ReportHeader, ReportTable, StatCard, TimeFilterBar } from "./components"
+import { DonutChart, ReportHeader, ReportTable, StatCard, TimeFilterBar } from "./components"
 import {
   DATA_SOURCES, DEFAULT_TIME, GD_TXNS, METHODS, PROVINCES, TCHNCC_LIST,
   distribution, exportFileName, exportResult, inRange, resolveRange, scopeRows,
