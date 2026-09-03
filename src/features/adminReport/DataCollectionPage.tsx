@@ -42,7 +42,7 @@ export function DataCollectionPage() {
 
   const totalPackages = rows.reduce((s, r) => s + r.packages, 0)
   const totalRecords = rows.reduce((s, r) => s + r.recordsOk, 0)
-  const failCount = rows.filter((r) => r.status === "Thất bại").length
+  const totalSizeMb = rows.reduce((s, r) => s + r.sizeMb, 0)
 
   const columns = [
     { key: "stt", header: "STT", cell: (_: CollectionRow, i: number) => <span className="tabular-nums text-foreground-muted">{i + 1}</span>, className: "w-11 text-center" },
@@ -82,9 +82,9 @@ export function DataCollectionPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <StatCard label="Tổng gói tin" value={fmtNum(totalPackages)} />
-          <StatCard label="Bản ghi thành công" value={fmtNum(totalRecords)} color="#047857" bg="#ecfdf5" />
-          <StatCard label="Số lượt thất bại" value={failCount} danger={failCount > 0} />
+          <StatCard label="Tổng gói" value={fmtNum(totalPackages)} />
+          <StatCard label="Tổng bản ghi" value={fmtNum(totalRecords)} color="#047857" bg="#ecfdf5" />
+          <StatCard label="Tổng dung lượng (MB)" value={fmtNum(totalSizeMb)} color="#7c3aed" bg="#f5f3ff" />
         </div>
 
         <DataTable title="Bảng chi tiết thu thập dữ liệu" rows={rows} columns={columns} page={page} pageSize={pageSize} onPage={setPage} onPageSize={(n) => { setPageSize(n); setPage(1) }} />
