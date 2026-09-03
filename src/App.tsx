@@ -75,6 +75,7 @@ import { DataCleansingPage } from "@/features/adminReport/DataCleansingPage"
 import { DataNormalizationPage } from "@/features/adminReport/DataNormalizationPage"
 import { DataReconciliationPage } from "@/features/adminReport/DataReconciliationPage"
 import { DataPostcheckPage } from "@/features/adminReport/DataPostcheckPage"
+import { BtpDashboardPage } from "@/features/dashboard/BtpDashboardPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -93,6 +94,7 @@ function NormalizationRoute() {
 
 // Route đã có component thật — loại khỏi danh sách placeholder tự sinh.
 const REAL_ROUTES = new Set([
+  "/dashboard",
   "/thu-nhan/don-vi-cung-cap",
   "/thu-nhan/phuong-thuc",
   "/thu-nhan/nhat-ky",
@@ -201,6 +203,7 @@ function App() {
         <Route path="/admin-report/data-normalization" element={<DataNormalizationPage />} />
         <Route path="/admin-report/data-reconciliation" element={<DataReconciliationPage />} />
         <Route path="/admin-report/data-postcheck" element={<DataPostcheckPage />} />
+        <Route path="/dashboard" element={<BtpDashboardPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

@@ -1,0 +1,220 @@
+import { useState } from "react"
+import { Download, RefreshCw, ShieldX } from "lucide-react"
+
+import { NativeSelect } from "@/features/reconciliation/components/NativeSelect"
+import { PageHeader } from "../ingestion/shared"
+import { DASHBOARD_ROLES, type DashboardRole } from "./config"
+
+/* ============================ HEADER + VAI TRÒ (BR-01) ============================ */
+export function DashboardHeader({ role, onRole, actions }: { role: DashboardRole; onRole: (r: DashboardRole) => void; actions?: React.ReactNode }) {
+  return (
+    <PageHeader title="Dashboard thông tin tổng hợp — Bộ Tư pháp" desc="Thống kê tổng quan TCHNCC, CCV, giao dịch công chứng và ngăn chặn/cảnh báo rủi ro trên phạm vi toàn quốc."
+      actions={
+        <div className="flex items-center gap-3">
+          {actions}
+          <div className="flex items-center gap-2">
+            <span className="text-[12.5px] text-foreground-muted">Vai trò:</span>
+            <NativeSelect value={role} onChange={(e) => onRole(e.target.value as DashboardRole)} className="h-8 w-[220px] text-[12.5px]">
+              {DASHBOARD_ROLES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
+            </NativeSelect>
+          </div>
+        </div>
+      } />
+  )
+}
+
+/** BR-01/VR-07: chặn truy cập khi tài khoản không thuộc Bộ Tư pháp (MSG_E-000701_001). */
+export function AccessGate({ role, children }: { role: DashboardRole; children: React.ReactNode }) {
+  if (role !== "khac") return <>{children}</>
+  return (
+    <div className="flex flex-col items-center gap-3 rounded-[14px] border border-[#fecaca] bg-[#fef2f2] px-6 py-16 text-center">
+      <div className="flex size-12 items-center justify-center rounded-full bg-[#fee2e2] text-[#b91c1c]"><ShieldX className="size-6" /></div>
+      <div className="text-[15px] font-semibold text-[#b91c1c]">Bạn không có quyền truy cập.</div>
+      <div className="max-w-md text-[13px] text-[#b91c1c]/80">Dashboard thông tin tổng hợp cấp Bộ Tư pháp chỉ dành cho tài khoản Lãnh đạo Bộ Tư pháp, Lãnh đạo Cục BTTP hoặc Chuyên viên Cục BTTP.</div>
+    </div>
+  )
+}
+
+export function F({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
+  return <div className="flex flex-col gap-1.5"><label className="text-xs font-semibold text-foreground-strong">{label}{required && <span className="text-[#dc2626]"> *</span>}</label>{children}</div>
+}
+
+/* ============================ THẺ CHỈ SỐ (C01–C05) ============================ */
+export function StatCard({ label, value, color = "#2563eb", bg = "#eff6ff", icon }: { label: string; value: string | number; color?: string; bg?: string; icon?: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 rounded-[14px] border border-border bg-surface p-4 shadow-sm">
+      {icon && <div className="flex size-11 items-center justify-center rounded-xl" style={{ background: bg, color }}>{icon}</div>}
+      <div>
+        <div className="text-[22px] font-semibold tabular-nums" style={{ color }}>{value}</div>
+        <div className="text-[12px] text-foreground-muted">{label}</div>
+        <div className="text-[11px] text-foreground-subtle">Phát sinh trong kỳ</div>
+      </div>
+    </div>
+  )
+}
+
+/* ============================ KHUNG BIỂU ĐỒ DÙNG CHUNG ============================ */
+export function ChartCard({ title, onExport, toggleLabel, onToggle, children, legend }: {
+  title: string; onExport: () => void; toggleLabel?: string; onToggle?: () => void; children: React.ReactNode; legend?: React.ReactNode
+}) {
+  return (
+    <div className="rounded-[14px] border border-border bg-surface p-4 shadow-sm">
+      <div className="mb-3 text-[13px] font-semibold text-foreground-strong">{title}</div>
+      {children}
+      {legend && <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[12px] text-foreground-muted">{legend}</div>}
+      <div className="mt-3 flex gap-2 border-t border-border pt-3">
+        <button onClick={onExport} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border px-3 text-[12.5px] font-medium text-foreground-strong hover:bg-neutral-50"><Download className="size-3.5" />Xuất biểu đồ</button>
+        {onToggle && <button onClick={onToggle} className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border px-3 text-[12.5px] font-medium text-foreground-strong hover:bg-neutral-50"><RefreshCw className="size-3.5" />{toggleLabel ?? "Thay đổi hiển thị"}</button>}
+      </div>
+    </div>
+  )
+}
+
+export const PALETTE = ["#2563eb", "#059669", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#db2777"]
+const fmt = (n: number) => n.toLocaleString("vi-VN")
+
+/* ============================ B01/B03: TRÒN ↔ CỘT ============================ */
+export function PieOrBar({ data, mode }: { data: { label: string; value: number; color: string }[]; mode: "pie" | "bar" }) {
+  const total = data.reduce((s, d) => s + d.value, 0) || 1
+  if (mode === "bar") {
+    const max = Math.max(...data.map((d) => d.value), 1)
+    return (
+      <div className="flex h-[220px] items-end justify-around gap-3 px-2">
+        {data.map((d) => (
+          <div key={d.label} className="flex flex-1 flex-col items-center gap-1.5">
+            <span className="text-[11px] font-medium tabular-nums text-foreground-strong">{fmt(d.value)}</span>
+            <div className="w-full max-w-14 rounded-t-md" style={{ height: `${(d.value / max) * 160}px`, background: d.color }} title={`${d.label} — Số lượng: ${fmt(d.value)} (${((d.value / total) * 100).toFixed(1)}%)`} />
+            <span className="text-center text-[11px] text-foreground-muted">{d.label}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
+  let acc = 0
+  const R = 70, C = 90
+  const slices = data.map((d) => {
+    const startAngle = (acc / total) * 2 * Math.PI; acc += d.value
+    const endAngle = (acc / total) * 2 * Math.PI
+    const large = endAngle - startAngle > Math.PI ? 1 : 0
+    const x1 = C + R * Math.sin(startAngle), y1 = C - R * Math.cos(startAngle)
+    const x2 = C + R * Math.sin(endAngle), y2 = C - R * Math.cos(endAngle)
+    return { d: `M${C},${C} L${x1},${y1} A${R},${R} 0 ${large} 1 ${x2},${y2} Z`, ...d }
+  })
+  return (
+    <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <svg viewBox="0 0 180 180" className="h-[180px] w-[180px] shrink-0">
+        {slices.map((s) => <path key={s.label} d={s.d} fill={s.color} stroke="#fff" strokeWidth={1.5}><title>{`${s.label} — Số lượng: ${fmt(s.value)} (${((s.value / total) * 100).toFixed(1)}%)`}</title></path>)}
+        <circle cx={C} cy={C} r={40} fill="var(--color-surface, #fff)" />
+      </svg>
+      <div className="space-y-1.5">
+        {data.map((d) => <div key={d.label} className="flex items-center gap-2 text-[12.5px]"><span className="size-2.5 rounded-full" style={{ background: d.color }} /><span className="text-foreground-muted">{d.label}:</span><span className="font-semibold tabular-nums text-foreground-strong">{((d.value / total) * 100).toFixed(1)}%</span></div>)}
+      </div>
+    </div>
+  )
+}
+
+/* ============================ B02/B07/B08/B11/B12: ĐƯỜNG ↔ VÙNG (1 hoặc nhiều series) ============================ */
+export function LineOrArea({ categories, series, mode }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "area" }) {
+  const W = 760, H = 220, pad = 34
+  const n = categories.length
+  const maxV = Math.max(1, ...series.flatMap((s) => s.data)) * 1.1
+  const x = (i: number) => pad + (i * (W - pad * 2)) / (Math.max(n, 2) - 1)
+  const y = (v: number) => H - pad - (v / maxV) * (H - pad * 2)
+  const step = Math.max(1, Math.ceil(n / 10))
+  if (!n || series.every((s) => s.data.every((v) => v === 0))) return <div className="flex h-[220px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
+      {[0, 0.25, 0.5, 0.75, 1].map((f, i) => <line key={i} x1={pad} x2={W - pad} y1={pad + f * (H - pad * 2)} y2={pad + f * (H - pad * 2)} stroke="#f1f5f9" strokeWidth={1} />)}
+      {series.map((s) => {
+        const pts = s.data.map((v, i) => `${x(i)},${y(v)}`).join(" ")
+        return (
+          <g key={s.name}>
+            {mode === "area" && <polygon points={`${pad},${H - pad} ${pts} ${x(n - 1)},${H - pad}`} fill={s.color} opacity={0.12} />}
+            <polyline points={pts} fill="none" stroke={s.color} strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round" />
+            {s.data.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={2.75} fill="#fff" stroke={s.color} strokeWidth={2}><title>{`${s.name} — ${categories[i]}: ${fmt(v)}`}</title></circle>)}
+          </g>
+        )
+      })}
+      {categories.map((l, i) => (i % step === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+    </svg>
+  )
+}
+
+/* ============================ B09/B10: ĐƯỜNG NHIỀU SERIES ↔ CỘT XẾP CHỒNG ============================ */
+export function LineOrStackedBar({ categories, series, mode }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "stackedBar" }) {
+  if (mode === "line") return <LineOrArea categories={categories} series={series} mode="line" />
+  const W = 760, H = 220, pad = 34
+  const n = categories.length
+  const totals = categories.map((_, i) => series.reduce((s, ser) => s + ser.data[i], 0))
+  const maxV = Math.max(1, ...totals) * 1.1
+  const bw = Math.min(36, (W - pad * 2) / Math.max(n, 1) - 8)
+  const x = (i: number) => pad + (i * (W - pad * 2)) / Math.max(n, 1) + ((W - pad * 2) / Math.max(n, 1) - bw) / 2
+  const y = (v: number) => H - pad - (v / maxV) * (H - pad * 2)
+  if (!n || totals.every((t) => t === 0)) return <div className="flex h-[220px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
+      {categories.map((_, i) => {
+        let acc = 0
+        return series.map((s) => {
+          const v = s.data[i]
+          const yTop = y(acc + v), yBottom = y(acc)
+          acc += v
+          return <rect key={s.name} x={x(i)} y={yTop} width={bw} height={Math.max(0, yBottom - yTop)} fill={s.color}><title>{`${s.name} — ${categories[i]}: ${fmt(v)}`}</title></rect>
+        })
+      })}
+      {categories.map((l, i) => <text key={i} x={x(i) + bw / 2} y={H - 8} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+    </svg>
+  )
+}
+
+/* ============================ B13: CỘT NGANG ↔ BẢNG DỮ LIỆU ============================ */
+export interface ProvinceDist { tinh: string; dienTu: number; giay: number; total: number }
+export function HorizontalBarOrTable({ data, mode }: { data: ProvinceDist[]; mode: "bar" | "table" }) {
+  const totalAll = data.reduce((s, d) => s + d.total, 0) || 1
+  if (mode === "table") {
+    return (
+      <div className="max-h-[420px] overflow-auto rounded-lg border border-border">
+        <table className="w-full border-collapse text-[13px]">
+          <thead className="sticky top-0 bg-neutral-50"><tr>
+            <th className="px-3 py-2 text-left font-semibold text-foreground-strong">STT</th>
+            <th className="px-3 py-2 text-left font-semibold text-foreground-strong">Tỉnh/Thành phố</th>
+            <th className="px-3 py-2 text-right font-semibold text-foreground-strong">GDCC điện tử</th>
+            <th className="px-3 py-2 text-right font-semibold text-foreground-strong">GDCC giấy</th>
+            <th className="px-3 py-2 text-right font-semibold text-foreground-strong">Tỉ lệ toàn quốc</th>
+            <th className="px-3 py-2 text-right font-semibold text-foreground-strong">Tổng số</th>
+          </tr></thead>
+          <tbody>{data.map((d, i) => (
+            <tr key={d.tinh} className="border-t border-neutral-100">
+              <td className="px-3 py-2 text-foreground-muted">{i + 1}</td>
+              <td className="px-3 py-2 font-medium text-foreground">{d.tinh}</td>
+              <td className="px-3 py-2 text-right tabular-nums text-foreground-muted">{fmt(d.dienTu)}</td>
+              <td className="px-3 py-2 text-right tabular-nums text-foreground-muted">{fmt(d.giay)}</td>
+              <td className="px-3 py-2 text-right tabular-nums text-foreground-muted">{((d.total / totalAll) * 100).toFixed(1)}%</td>
+              <td className="px-3 py-2 text-right tabular-nums font-semibold text-foreground-strong">{fmt(d.total)}</td>
+            </tr>
+          ))}</tbody>
+        </table>
+      </div>
+    )
+  }
+  const top = data.slice(0, 15)
+  const max = Math.max(1, ...top.map((d) => d.total))
+  return (
+    <div className="space-y-2">
+      {top.map((d) => (
+        <div key={d.tinh} className="flex items-center gap-3">
+          <span className="w-28 shrink-0 truncate text-[12px] text-foreground-muted" title={d.tinh}>{d.tinh}</span>
+          <div className="h-3 flex-1 overflow-hidden rounded-full bg-neutral-100">
+            <div className="h-full rounded-full bg-[#2563eb]" style={{ width: `${(d.total / max) * 100}%` }} title={`${d.tinh} — Số lượng: ${fmt(d.total)} (${((d.total / totalAll) * 100).toFixed(1)}%)`} />
+          </div>
+          <span className="w-16 shrink-0 text-right text-[12px] tabular-nums text-foreground-strong">{fmt(d.total)}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function useToggle<T extends string>(a: T, b: T) {
+  const [mode, setMode] = useState<T>(a)
+  return { mode, toggle: () => setMode((m) => (m === a ? b : a)) }
+}
