@@ -10,7 +10,7 @@ import { EmptyState, IconBtn, Pagination, PageHeader, StatusPill, Th, inputCls }
 import { blockById } from "./config"
 import {
   PROVINCES, RELEASE_RECORDS, RELEASE_STATUS, ROLE_LABEL, STATUS_TABS, isCentral, isCreatorRole, isLeader,
-  linkedBlocks, releaseSummary, type ReleaseRecord, type ReleaseRole, type ReleaseStatus,
+  releaseSummary, type ReleaseRecord, type ReleaseRole, type ReleaseStatus,
 } from "./config"
 import { AssignDialog, ConfirmDialog, HistoryDialog, ReasonDialog, RoleSelect, SubmitReviewDialog } from "./shared"
 

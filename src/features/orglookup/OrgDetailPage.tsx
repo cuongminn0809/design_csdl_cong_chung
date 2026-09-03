@@ -2,7 +2,6 @@ import { useEffect } from "react"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { ArrowLeft, Building2, Users } from "lucide-react"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { StatusPill, Th } from "../ingestion/shared"
 import { findOrg, markViewed, orgStatusMeta } from "./config"

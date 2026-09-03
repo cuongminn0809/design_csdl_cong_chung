@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useRef, useState } from "react"
 
-type ToastKind = "ok" | "error"
+type ToastKind = "ok" | "success" | "info" | "error"
 
 const ToastContext = createContext<(msg: string, kind?: ToastKind) => void>(() => {})
 
@@ -25,7 +25,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         <div className="fixed bottom-6 left-1/2 z-[200] flex max-w-[90vw] -translate-x-1/2 items-center gap-2.5 rounded-[10px] bg-neutral-900 px-[18px] py-3 text-[13.5px] text-white shadow-popover">
           <span
             className="size-4 shrink-0 rounded-full"
-            style={{ background: toast.kind === "ok" ? "#22c55e" : "#ef4444" }}
+            style={{ background: toast.kind === "error" ? "#ef4444" : toast.kind === "info" ? "#f59e0b" : "#22c55e" }}
           />
           {toast.msg}
         </div>

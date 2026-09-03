@@ -73,7 +73,6 @@ export const CRITERIA_GROUPS: CriteriaGroup[] = [
 
 export const ALL_CRITERIA: Criterion[] = CRITERIA_GROUPS.flatMap((g) => g.children)
 export const CRITERION_LABEL: Record<string, string> = Object.fromEntries(ALL_CRITERIA.map((c) => [c.code, c.label]))
-const GROUP_OF: Record<string, string> = Object.fromEntries(CRITERIA_GROUPS.flatMap((g) => g.children.map((c) => [c.code, g.code])))
 export const groupByCode = (code: string) => CRITERIA_GROUPS.find((g) => g.code === code)
 // Tập mã tiêu chí con của một tham số (mã nhóm G* → các con; mã tiêu chí UC* → chính nó).
 export function expandCriteria(codes: string[]): string[] {

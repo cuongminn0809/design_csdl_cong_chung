@@ -12,7 +12,7 @@ import { ApproveModal, QrScanModal, RejectModal, RequestDetailModal, SendRequest
 import {
   REQ_STATUS, REQ_STATUS_OPTIONS, REQUESTS, SO_TU_PHAP, TCHNCC_BY_STP, VIEW_LOGS,
   approveRequest, cancelRequest, createRequest, hasActiveRequest, maskDoc, maskEmail, maskPhone, rejectRequest, searchByQr, searchBySoCC, stats,
-  type Participant, type ReferenceRequest, type ReqStatus, type SendMethod, type VbccdtRecord,
+  type ReferenceRequest, type SendMethod, type VbccdtRecord,
 } from "./config"
 
 type Tab = "search" | "sent" | "received" | "history"
@@ -238,7 +238,7 @@ function ListFilters({ draft, setDraft, onSearch, onReset, error }: { draft: Lis
     </div>
   )
 }
-const parseGui = (s: string) => { const [d, rest] = s.split(" "); const [dd, mm, yy] = d.split("/"); return `${yy}-${mm}-${dd}` }
+const parseGui = (s: string) => { const [dd, mm, yy] = s.split(" ")[0].split("/"); return `${yy}-${mm}-${dd}` }
 function applyFilter(rows: ReferenceRequest[], f: ListFilter) {
   return rows.filter((r) => {
     if (f.soCC && !r.soCC.toLowerCase().includes(f.soCC.trim().toLowerCase())) return false
