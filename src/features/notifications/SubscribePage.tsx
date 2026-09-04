@@ -28,16 +28,16 @@ export function SubscribePage() {
   const doCancel = () => setDraft(saved)
 
   return (
-    <div className="space-y-4">
-      <div className="mb-1 flex items-end justify-between gap-5">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/tien-ich/thong-bao")} className="flex size-9 items-center justify-center rounded-md border border-border bg-surface text-foreground-muted shadow-xs hover:bg-surface-muted"><ArrowLeft className="size-4" /></button>
-          <div>
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-6">
+        <div className="flex items-start gap-4">
+          <button onClick={() => navigate("/tien-ich/thong-bao")} className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-foreground-muted shadow-xs hover:bg-surface-muted"><ArrowLeft className="size-4" /></button>
+          <div className="max-w-xl">
             <h3 className="text-[24px] font-semibold leading-tight tracking-[-0.02em] text-foreground-strong">Đăng ký nhận thông báo</h3>
-            <p className="mt-1.5 text-sm text-foreground-muted">Chọn các nhóm thông tin bạn muốn nhận thông báo. Áp dụng ngay sau khi lưu, không ảnh hưởng thông báo đã gửi trước đó.</p>
+            <p className="mt-2 text-sm leading-relaxed text-foreground-muted">Chọn các nhóm thông tin bạn muốn nhận thông báo. Áp dụng ngay sau khi lưu, không ảnh hưởng thông báo đã gửi trước đó.</p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 pt-1.5">
           <span className="text-[12.5px] text-foreground-muted">Vai trò:</span>
           <select value={role} onChange={(e) => setCurrentRole(e.target.value as typeof role)} className="h-8 w-[220px] cursor-pointer rounded-md border border-input bg-surface px-2 text-[12.5px]">
             {NOTI_ROLES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
@@ -51,10 +51,10 @@ export function SubscribePage() {
             {groups.map((g) => {
               const on = draft[g.id] ?? true
               return (
-                <li key={g.id} className="flex items-center justify-between gap-4 px-5 py-4">
+                <li key={g.id} className="flex items-center justify-between gap-6 px-6 py-5">
                   <div className="min-w-0">
-                    <div className="text-[13.5px] font-semibold text-foreground-strong">{g.name}</div>
-                    <div className="mt-0.5 text-[12.5px] text-foreground-muted">{g.events}</div>
+                    <div className="text-[14px] font-semibold text-foreground-strong">{g.name}</div>
+                    <div className="mt-1 text-[12.5px] leading-relaxed text-foreground-muted">{g.events}</div>
                   </div>
                   <button
                     type="button"
