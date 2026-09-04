@@ -47,14 +47,14 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
     <div>
       {item.path ? (
         // Group có route: nhãn điều hướng (NavLink), nút chevron riêng để mở/đóng con.
-        <div className="flex items-center gap-0.5" style={{ paddingLeft: 10 + depth * 14 }}>
+        <div className="flex items-center gap-0.5" style={{ marginLeft: depth * 14 }}>
           <NavLink
             to={item.path}
             end
             className={({ isActive }) =>
               cn(
-                // paddingLeft đã áp dụng ở wrapper (dòng trên) — chỉ giữ pr-2.5 ở đây để tránh cộng dồn thụt lề.
-                "flex flex-1 items-center gap-2.5 rounded-md py-1.5 pr-2.5 text-sm font-medium outline-none transition-colors hover:bg-surface-muted focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                // Thụt lề theo depth nằm ở marginLeft của wrapper (không tô màu); px-2.5 ở đây tạo khoảng đệm bên trong nền pill khi active.
+                "flex flex-1 items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium outline-none transition-colors hover:bg-surface-muted focus-visible:ring-[3px] focus-visible:ring-ring/50",
                 isActive ? "bg-neutral-900 text-neutral-50 hover:bg-neutral-900" : active ? "text-foreground-strong" : "text-foreground-muted"
               )
             }
