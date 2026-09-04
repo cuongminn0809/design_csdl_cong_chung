@@ -57,7 +57,10 @@ export function SubscribePage() {
                     aria-pressed={on}
                     className={cn("relative h-6 w-11 shrink-0 rounded-full transition-colors", on ? "bg-neutral-900" : "bg-neutral-200")}
                   >
-                    <span className={cn("absolute top-0.5 size-5 rounded-full bg-white shadow-sm transition-transform", on ? "translate-x-[22px]" : "translate-x-0.5")} />
+                    <span
+                      className="absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow-sm transition-transform"
+                      style={{ transform: on ? "translateX(22px)" : "translateX(0)" }}
+                    />
                   </button>
                 </li>
               )
