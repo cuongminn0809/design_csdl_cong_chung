@@ -66,7 +66,14 @@ export function DataFeedbackPage() {
         <>
           <div className="flex gap-1 border-b border-border">
             {(["xu-ly", "hau-kiem"] as const).map((t) => (
-              <button key={t} onClick={() => { setTab(t); setPage(1) }} className={cn("border-b-2 px-3 py-2 text-[13.5px] font-medium transition-colors", tab === t ? "border-neutral-900 text-foreground-strong" : "border-transparent text-foreground-muted hover:text-foreground")}>
+              <button
+                key={t}
+                onClick={() => { setTab(t); setPage(1) }}
+                className={cn(
+                  "-mb-px border-b-[3px] px-3 py-2 text-[13.5px] outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  tab === t ? "border-neutral-900 font-semibold text-foreground-strong" : "border-transparent font-medium text-foreground-muted hover:text-foreground"
+                )}
+              >
                 {t === "xu-ly" ? "Phản hồi xử lý dữ liệu" : "Phản hồi hậu kiểm dữ liệu"}
               </button>
             ))}
@@ -91,18 +98,25 @@ export function DataFeedbackPage() {
             {paged.length ? (
               <>
                 <div className="overflow-x-auto">
-                  <table className="w-full border-collapse text-sm">
-                    <thead><tr className="border-b border-border bg-neutral-50"><Th className="w-11 text-center">STT</Th><Th>Tiêu đề phản hồi</Th><Th>Hồ sơ liên quan</Th><Th>Thời gian nhận</Th><Th>TT xử lý</Th><Th className="text-right">Thao tác</Th></tr></thead>
+                  <table className="w-full table-fixed border-collapse text-sm">
+                    <thead><tr className="border-b border-border bg-neutral-50">
+                      <Th className="w-11 text-center">STT</Th>
+                      <Th className="w-[30%]">Tiêu đề phản hồi</Th>
+                      <Th className="w-[20%]">Hồ sơ liên quan</Th>
+                      <Th className="w-[160px]">Thời gian nhận</Th>
+                      <Th className="w-[110px]">TT xử lý</Th>
+                      <Th className="w-[220px] text-right">Thao tác</Th>
+                    </tr></thead>
                     <tbody>{paged.map((f, i) => (
                       <tr key={f.id} className="border-b border-neutral-100 hover:bg-neutral-50">
                         <td className="px-4 py-3 text-center tabular-nums text-foreground-muted">{(page - 1) * pageSize + i + 1}</td>
-                        <td className="max-w-[260px] px-4 py-3">
-                          <button onClick={() => setDetailId(f.id)} className={cn("flex items-center gap-1.5 text-left hover:underline", !f.read ? "font-semibold text-foreground-strong" : "text-foreground")} title={f.title}>
+                        <td className="px-4 py-3">
+                          <button onClick={() => setDetailId(f.id)} className={cn("flex w-full min-w-0 items-center gap-1.5 text-left hover:underline", !f.read ? "font-semibold text-foreground-strong" : "text-foreground")} title={f.title}>
                             {!f.read && <span className="size-1.5 shrink-0 rounded-full bg-red-600" />}
-                            <span className="truncate">{f.title}</span>
+                            <span className="min-w-0 flex-1 truncate">{f.title}</span>
                           </button>
                         </td>
-                        <td className="px-4 py-3 text-foreground-muted">{f.relatedLabel}</td>
+                        <td className="truncate px-4 py-3 text-foreground-muted" title={f.relatedLabel}>{f.relatedLabel}</td>
                         <td className="px-4 py-3 tabular-nums text-foreground-muted">{fmtVNDateTime(f.receivedAt)}</td>
                         <td className="px-4 py-3">{f.status === "Chờ xử lý" ? <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11.5px] font-medium text-amber-700">Chờ xử lý</span> : <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11.5px] font-medium text-emerald-700">Đã xử lý</span>}</td>
                         <td className="px-4 py-3">
