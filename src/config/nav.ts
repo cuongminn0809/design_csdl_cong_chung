@@ -3,7 +3,7 @@ import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
   LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList, FileSpreadsheet, Landmark,
   Activity, Server, DownloadCloud, SprayCan, Wand2, GitMerge, SearchCheck, FileStack,
-  HelpCircle, UserRound, KeyRound, Wrench, Bell, MessageSquareWarning,
+  HelpCircle, UserRound, KeyRound, Wrench, Bell, MessageSquareWarning, Layers,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -160,6 +160,24 @@ export const SUBSYSTEMS: Subsystem[] = [
         children: [
           { type: "leaf", label: "Danh mục dùng chung", path: "/quan-tri/danh-muc-dung-chung" },
           { type: "leaf", label: "Danh mục riêng của hệ thống", path: "/quan-tri/danh-muc-rieng" },
+        ],
+      },
+      {
+        type: "group",
+        label: "Quản lý cấu hình",
+        icon: Settings2,
+        children: [
+          {
+            type: "group",
+            label: "Cấu hình thông báo",
+            icon: Bell,
+            children: [
+              { type: "leaf", label: "Loại thông báo", path: "/quan-ly-cau-hinh/cau-hinh-thong-bao/loai-thong-bao", icon: List },
+              { type: "leaf", label: "Nhóm thông tin nhận thông báo", path: "/quan-ly-cau-hinh/cau-hinh-thong-bao/nhom-thong-tin", icon: Layers },
+              { type: "leaf", label: "Cài đặt nhận thông báo", path: "/quan-ly-cau-hinh/cau-hinh-thong-bao/cai-dat-nhan", icon: SlidersHorizontal },
+              { type: "leaf", label: "Tạo thông báo", path: "/quan-ly-cau-hinh/cau-hinh-thong-bao/tao-thong-bao", icon: Send },
+            ],
+          },
         ],
       },
     ],
