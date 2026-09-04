@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { AlertTriangle, Building2, FileText, MapPin, Settings2, ShieldAlert, Users } from "lucide-react"
+import { AlertTriangle, Archive, Building2, FileText, MapPin, Settings2, ShieldAlert, Users } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -11,9 +11,9 @@ import {
   type ProvinceDist,
 } from "./components"
 import {
-  CCV_RECORDS, DEFAULT_FILTER, DON_VI_KHAITHAC, GDCC_RECORDS, KHAITHAC_RECORDS, LOAI_DU_LIEU_KHAITHAC, LOAI_GD_LIST, LOAI_TAISAN_LIST,
-  NGANCHAN_RECORDS, PERIOD_KINDS, PROVINCES_34, QUARTERS, MONTHS, STP_PROVINCE, TCHNCC_RECORDS, YEAR_OPTIONS,
-  buildBuckets, countInRange, exportMsg, fmtVN, inRange, isBoRole, resolveRange, scopeByProvince, sumByBucket, sumByBucketSeries, validateFilter,
+  CCV_RECORDS, DEFAULT_FILTER, DON_VI_KHAITHAC, GDCC_RECORDS, KHAITHAC_RECORDS, LOAI_DU_LIEU_KHAITHAC, LOAI_GD_LIST, LOAI_TAISAN_LIST, LUUTRU_RECORDS,
+  NGANCHAN_RECORDS, PERIOD_KINDS, PROVINCES_34, QUARTERS, MONTHS, STP_PROVINCE, TCHNCC_HOME_ORG, TCHNCC_RECORDS, YEAR_OPTIONS, YEUCAUKT_RECORDS,
+  buildBuckets, countInRange, exportMsg, fmtVN, inRange, isBoRole, isTchnccRole, resolveRange, scopeByOrg, scopeByProvince, sumByBucket, sumByBucketSeries, validateFilter,
   type DashboardRole, type FilterState,
 } from "./config"
 
@@ -21,6 +21,7 @@ export function DashboardPage() {
   const showToast = useToast()
   const [role, setRole] = useState<DashboardRole>("ld_btp")
   const bo = isBoRole(role)
+  const tchncc = isTchnccRole(role)
   const [draft, setDraft] = useState<FilterState>(DEFAULT_FILTER)
   const [applied, setApplied] = useState<FilterState>(DEFAULT_FILTER)
   const [error, setError] = useState("")
@@ -37,20 +38,42 @@ export function DashboardPage() {
   const buckets = useMemo(() => buildBuckets(applied), [applied])
   const scopeProvince = bo ? applied.province : STP_PROVINCE
 
-  const gdcc = useMemo(() => scopeByProvince(GDCC_RECORDS, scopeProvince), [scopeProvince])
-  const tchncc = useMemo(() => scopeByProvince(TCHNCC_RECORDS, scopeProvince), [scopeProvince])
+  // BR-09: TCHNCC scope theo tổ chức cố định (toChuc); BTP/STP scope theo tỉnh/thành.
+  const gdcc = useMemo(() => tchncc ? scopeByOrg(GDCC_RECORDS, TCHNCC_HOME_ORG) : scopeByProvince(GDCC_RECORDS, scopeProvince), [tchncc, scopeProvince])
+  const tchnccOrgs = useMemo(() => scopeByProvince(TCHNCC_RECORDS, scopeProvince), [scopeProvince])
   const ccv = useMemo(() => scopeByProvince(CCV_RECORDS, scopeProvince), [scopeProvince])
   const nganchan = useMemo(() => scopeByProvince(NGANCHAN_RECORDS, scopeProvince), [scopeProvince])
   const gdccHieuLuc = useMemo(() => gdcc.filter((r) => r.trangThai === "Có hiệu lực"), [gdcc])
-  // BR-08: lượt khai thác trên địa bàn — STP chỉ tính đơn vị Sở Tư pháp của mình, BTP tính toàn quốc.
-  const khaithac = useMemo(() => bo ? KHAITHAC_RECORDS : KHAITHAC_RECORDS.filter((r) => r.donVi === `Sở Tư pháp ${STP_PROVINCE}`), [bo])
+  // BR-08: lượt khai thác — STP chỉ tính đơn vị Sở Tư pháp của mình, TCHNCC chỉ tính lượt do tổ chức mình thực hiện, BTP tính toàn quốc.
+  const khaithac = useMemo(() => {
+    if (bo) return KHAITHAC_RECORDS
+    if (tchncc) return KHAITHAC_RECORDS.filter((r) => r.donVi === "TCHNCC")
+    return KHAITHAC_RECORDS.filter((r) => r.donVi === `Sở Tư pháp ${STP_PROVINCE}`)
+  }, [bo, tchncc])
 
-  // C01–C05 (dùng chung cho cả 2 cấp, chỉ khác phạm vi địa bàn)
-  const c01 = countInRange(tchncc.filter((r) => r.trangThai === "Đang hoạt động"), (r) => r.ngayThanhLap, range.from, range.to)
+  // C01–C05 (BTP/STP) — dùng chung, chỉ khác phạm vi địa bàn.
+  const c01 = countInRange(tchnccOrgs.filter((r) => r.trangThai === "Đang hoạt động"), (r) => r.ngayThanhLap, range.from, range.to)
   const c02 = countInRange(ccv.filter((r) => r.trangThai === "Đang hành nghề"), (r) => r.ngayCapCC, range.from, range.to)
   const c03 = countInRange(gdccHieuLuc, (r) => r.ngayCC, range.from, range.to)
   const c04 = countInRange(nganchan.filter((r) => r.loai === "Thông tin ngăn chặn" && r.trangThai === "Đã duyệt"), (r) => r.ngay, range.from, range.to)
   const c05 = countInRange(nganchan.filter((r) => r.loai === "Cảnh báo rủi ro" && r.trangThai === "Đã duyệt"), (r) => r.ngay, range.from, range.to)
+
+  // C01–C03 (TCHNCC, A.7.3) — Hồ sơ công chứng (mọi trạng thái), VBCC điện tử, Hồ sơ lưu trữ điện tử.
+  const luutru = useMemo(() => scopeByOrg(LUUTRU_RECORDS, TCHNCC_HOME_ORG), [])
+  const c01Tchncc = countInRange(gdcc, (r) => r.ngayCC, range.from, range.to)
+  const c02Tchncc = countInRange(gdcc.filter((r) => r.phuongThuc !== "Công chứng giấy"), (r) => r.ngayCC, range.from, range.to)
+  const c03Tchncc = countInRange(luutru, (r) => r.ngay, range.from, range.to)
+
+  // B01 (TCHNCC, A.7.3): đối soát tra cứu — tần suất lượt tra cứu do tổ chức thực hiện theo thời gian.
+  const bDoiSoat = useToggle<"line" | "area">("line", "area")
+  const doiSoatSeries = [{ name: "Lượt tra cứu", color: PALETTE[0], data: sumByBucket(khaithac, (r) => r.ngay, buckets) }]
+
+  // B07 (TCHNCC, A.7.3): yêu cầu khai thác chi tiết GDCC — 2 series nhận/gửi.
+  const bYeuCauKt = useToggle<"line" | "area">("line", "area")
+  const yeuCauKtSeries = [
+    { name: "YC khai thác nhận (từ TCHNCC khác)", color: PALETTE[1], data: sumByBucket(YEUCAUKT_RECORDS.filter((r) => r.denToChuc === TCHNCC_HOME_ORG), (r) => r.ngay, buckets) },
+    { name: "YC khai thác gửi (đến TCHNCC khác)", color: PALETTE[2], data: sumByBucket(YEUCAUKT_RECORDS.filter((r) => r.tuToChuc === TCHNCC_HOME_ORG), (r) => r.ngay, buckets) },
+  ]
 
   // B01 (dùng chung): phương thức GDCC
   const b01Rows = useMemo(() => gdccHieuLuc.filter((r) => inRange(r.ngayCC, range.from, range.to)), [gdccHieuLuc, range])
@@ -118,10 +141,16 @@ export function DashboardPage() {
           <Button variant="outline" size="sm" onClick={() => showToast("Đang mở dialog kết xuất báo cáo Dashboard…")}>Kết xuất báo cáo</Button>
         </>} />
       <AccessGate role={role}>
-        {!bo && (
+        {!bo && !tchncc && (
           <div className="flex items-center gap-2 rounded-[14px] border border-border bg-surface px-4 py-2.5 text-[12.5px] text-foreground-muted shadow-sm">
             <MapPin className="size-4 text-foreground-subtle" />Địa bàn: <span className="font-semibold text-foreground-strong">Sở Tư pháp {STP_PROVINCE}</span>
             <span className="text-foreground-subtle">— dữ liệu tự động lọc theo địa bàn của tài khoản (BR-09), không có bộ lọc Tỉnh/Thành phố.</span>
+          </div>
+        )}
+        {tchncc && (
+          <div className="flex items-center gap-2 rounded-[14px] border border-border bg-surface px-4 py-2.5 text-[12.5px] text-foreground-muted shadow-sm">
+            <Building2 className="size-4 text-foreground-subtle" />Tổ chức: <span className="font-semibold text-foreground-strong">{TCHNCC_HOME_ORG}</span>
+            <span className="text-foreground-subtle">— dữ liệu tự động lọc theo tổ chức của tài khoản (BR-09), không có bộ lọc TCHNCC.</span>
           </div>
         )}
         <div className="rounded-[14px] border border-border bg-surface p-5 shadow-sm">
@@ -174,24 +203,38 @@ export function DashboardPage() {
           <div className="mt-3 text-[11.5px] text-foreground-subtle">* Phát sinh trong kỳ: {fmtVN(range.from)} – {fmtVN(range.to)} (D-2)</div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <StatCard label="Tổ chức HNCC" value={c01} icon={<Building2 className="size-5" />} />
-          <StatCard label="Công chứng viên" value={c02} color="#7c3aed" bg="#f5f3ff" icon={<Users className="size-5" />} />
-          <StatCard label="Giao dịch công chứng" value={c03} color="#047857" bg="#ecfdf5" icon={<FileText className="size-5" />} />
-          <StatCard label="Thông tin ngăn chặn" value={c04} color="#b45309" bg="#fffbeb" icon={<ShieldAlert className="size-5" />} />
-          <StatCard label="Cảnh báo rủi ro" value={c05} color="#b91c1c" bg="#fef2f2" icon={<AlertTriangle className="size-5" />} />
-        </div>
+        {tchncc ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <StatCard label="Hồ sơ công chứng" value={c01Tchncc} icon={<FileText className="size-5" />} />
+            <StatCard label="VBCC điện tử" value={c02Tchncc} color="#7c3aed" bg="#f5f3ff" icon={<Building2 className="size-5" />} />
+            <StatCard label="Hồ sơ lưu trữ điện tử" value={c03Tchncc} color="#047857" bg="#ecfdf5" icon={<Archive className="size-5" />} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <StatCard label="Tổ chức HNCC" value={c01} icon={<Building2 className="size-5" />} />
+            <StatCard label="Công chứng viên" value={c02} color="#7c3aed" bg="#f5f3ff" icon={<Users className="size-5" />} />
+            <StatCard label="Giao dịch công chứng" value={c03} color="#047857" bg="#ecfdf5" icon={<FileText className="size-5" />} />
+            <StatCard label="Thông tin ngăn chặn" value={c04} color="#b45309" bg="#fffbeb" icon={<ShieldAlert className="size-5" />} />
+            <StatCard label="Cảnh báo rủi ro" value={c05} color="#b91c1c" bg="#fef2f2" icon={<AlertTriangle className="size-5" />} />
+          </div>
+        )}
 
-        <ChartCard title="Phương thức giao dịch công chứng (B01)" onExport={() => doExport("PhuongThucGDCC")} onToggle={b01.toggle} toggleLabel={b01.mode === "pie" ? "Xem dạng cột" : "Xem dạng tròn"}>
+        {tchncc && (
+          <ChartCard title="Đối soát tra cứu thông tin (B01)" onExport={() => doExport("DoiSoatTraCuu")} onToggle={bDoiSoat.toggle} toggleLabel={bDoiSoat.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
+            <LineOrArea categories={buckets.map((b) => b.label)} series={doiSoatSeries} mode={bDoiSoat.mode} yLabel="Số lượt tra cứu" />
+          </ChartCard>
+        )}
+
+        <ChartCard title={`Phương thức giao dịch công chứng (${tchncc ? "B02" : "B01"})`} onExport={() => doExport("PhuongThucGDCC")} onToggle={b01.toggle} toggleLabel={b01.mode === "pie" ? "Xem dạng cột" : "Xem dạng tròn"}>
           <PieOrBar data={b01Data} mode={b01.mode} />
         </ChartCard>
 
-        <ChartCard title="Thống kê giao dịch công chứng điện tử (B02)" onExport={() => doExport("GDCCDienTu")} onToggle={b02.toggle} toggleLabel={b02.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}
+        <ChartCard title={`Thống kê giao dịch công chứng điện tử (${tchncc ? "B03" : "B02"})`} onExport={() => doExport("GDCCDienTu")} onToggle={b02.toggle} toggleLabel={b02.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}
           legend={b02Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
           <LineOrArea categories={buckets.map((b) => b.label)} series={b02Series} mode={b02.mode} yLabel="Số lượng GDCC điện tử" />
         </ChartCard>
 
-        {bo ? (
+        {bo && (
           <>
             <ChartCard title="Tình hình khai thác dữ liệu theo loại dữ liệu (B03)" onExport={() => doExport("KhaiThacTheoLoai")} onToggle={bKhaiThac.toggle} toggleLabel={bKhaiThac.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}>
               <PieOrBar data={khaiThacData} mode={bKhaiThac.mode} />
@@ -229,7 +272,9 @@ export function DashboardPage() {
               </ChartCard>
             </div>
           </>
-        ) : (
+        )}
+
+        {!bo && !tchncc && (
           <>
             <ChartCard title="Thống kê giao dịch công chứng giấy (B03)" onExport={() => doExport("GDCCGiay")} onToggle={bGiay.toggle} toggleLabel={bGiay.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}>
               <LineOrArea categories={buckets.map((b) => b.label)} series={giaySeries} mode={bGiay.mode} yLabel="Số lượng GDCC giấy" />
@@ -247,6 +292,32 @@ export function DashboardPage() {
                 <LineOrArea categories={buckets.map((b) => b.label)} series={voHieuSeries} mode={bVoHieu.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={400} />
               </ChartCard>
             </div>
+          </>
+        )}
+
+        {tchncc && (
+          <>
+            <ChartCard title="Thống kê giao dịch công chứng giấy (B04)" onExport={() => doExport("GDCCGiay")} onToggle={bGiay.toggle} toggleLabel={bGiay.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}>
+              <LineOrArea categories={buckets.map((b) => b.label)} series={giaySeries} mode={bGiay.mode} yLabel="Số lượng GDCC giấy" />
+            </ChartCard>
+
+            <ChartCard title="Tình hình khai thác dữ liệu theo loại dữ liệu (B05)" onExport={() => doExport("KhaiThacTheoLoai")} onToggle={bKhaiThac.toggle} toggleLabel={bKhaiThac.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}>
+              <PieOrBar data={khaiThacData} mode={bKhaiThac.mode} />
+            </ChartCard>
+
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+              <ChartCard title="Xu hướng giao dịch bị hủy (B06)" onExport={() => doExport("XuHuongBiHuy")} onToggle={bHuy.toggle} toggleLabel={bHuy.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
+                <LineOrArea categories={buckets.map((b) => b.label)} series={huySeries} mode={bHuy.mode} yLabel="Số lượng GDCC bị hủy" width={400} />
+              </ChartCard>
+              <ChartCard title="Xu hướng giao dịch bị tuyên vô hiệu (B08)" onExport={() => doExport("XuHuongVoHieu")} onToggle={bVoHieu.toggle} toggleLabel={bVoHieu.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
+                <LineOrArea categories={buckets.map((b) => b.label)} series={voHieuSeries} mode={bVoHieu.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={400} />
+              </ChartCard>
+            </div>
+
+            <ChartCard title="Yêu cầu khai thác chi tiết GDCC (B07)" onExport={() => doExport("YeuCauKhaiThac")} onToggle={bYeuCauKt.toggle} toggleLabel={bYeuCauKt.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}
+              legend={yeuCauKtSeries.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
+              <LineOrArea categories={buckets.map((b) => b.label)} series={yeuCauKtSeries} mode={bYeuCauKt.mode} yLabel="Số lượng yêu cầu khai thác" />
+            </ChartCard>
           </>
         )}
       </AccessGate>

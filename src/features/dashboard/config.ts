@@ -1,20 +1,32 @@
 /* ============================ VAI TRÒ (BR-01) ============================ */
 // A.7.1 (cấp BTP): ld_btp/ld_cuc_bttp/cv_btp — xem toàn quốc + lọc Tỉnh/TP.
 // A.7.2 (cấp STP): ld_stp/cv_stp — xem theo địa bàn cố định của người dùng, không có bộ lọc Tỉnh/TP (BR-09).
-export type DashboardRole = "ld_btp" | "ld_cuc_bttp" | "cv_btp" | "ld_stp" | "cv_stp" | "khac"
+// A.7.3 (cấp TCHNCC): ld_tchncc/ccv — xem theo tổ chức cố định của người dùng, không có bộ lọc TCHNCC (BR-09).
+export type DashboardRole = "ld_btp" | "ld_cuc_bttp" | "cv_btp" | "ld_stp" | "cv_stp" | "ld_tchncc" | "ccv" | "khac"
 export const DASHBOARD_ROLES: { key: DashboardRole; label: string }[] = [
   { key: "ld_btp", label: "Lãnh đạo Bộ Tư pháp" },
   { key: "ld_cuc_bttp", label: "Lãnh đạo Cục BTTP" },
   { key: "cv_btp", label: "Chuyên viên Cục BTTP" },
   { key: "ld_stp", label: "Lãnh đạo phòng chuyên môn STP" },
   { key: "cv_stp", label: "Chuyên viên Sở Tư pháp" },
+  { key: "ld_tchncc", label: "Lãnh đạo TCHNCC" },
+  { key: "ccv", label: "Công chứng viên" },
   { key: "khac", label: "Vai trò khác (không có quyền)" },
 ]
 export const canAccessDashboard = (r: DashboardRole) => r !== "khac"
 export const isBoRole = (r: DashboardRole) => r === "ld_btp" || r === "ld_cuc_bttp" || r === "cv_btp"
 export const isStpRole = (r: DashboardRole) => r === "ld_stp" || r === "cv_stp"
+export const isTchnccRole = (r: DashboardRole) => r === "ld_tchncc" || r === "ccv"
 // Địa bàn tỉnh/thành phố cố định của tài khoản STP demo (BR-09) — khớp quy ước "Sở Tư pháp Hà Nội" đã dùng ở các module khác.
 export const STP_PROVINCE = "Hà Nội"
+// Tổ chức HNCC cố định của tài khoản TCHNCC demo (BR-09) — khớp quy ước org↔tỉnh dùng chung toàn app.
+export const TCHNCC_ORGS = ["VPCC Nguyễn Văn A", "Phòng Công chứng số 1", "VPCC Trần Văn B", "VPCC Bến Thành", "VPCC Sông Hàn"]
+export const ORG_PROVINCE: Record<string, string> = {
+  "VPCC Nguyễn Văn A": "Hà Nội", "Phòng Công chứng số 1": "Hà Nội",
+  "VPCC Trần Văn B": "TP. Hồ Chí Minh", "VPCC Bến Thành": "TP. Hồ Chí Minh",
+  "VPCC Sông Hàn": "Đà Nẵng",
+}
+export const TCHNCC_HOME_ORG = "VPCC Nguyễn Văn A"
 
 /* ============================ DANH MỤC ĐỊA BÀN (34 Tỉnh/TP theo địa chỉ mới) ============================ */
 export const PROVINCES_34 = [
@@ -144,15 +156,22 @@ const isoInRange = (fromISO: string, toISO: string) => {
   return new Date(from + rand() * (to - from)).toISOString().slice(0, 10)
 }
 const PROVINCE_WEIGHTS = PROVINCES_34.map((p) => (p === "Hà Nội" || p === "TP. Hồ Chí Minh" ? 8 : p === "Đà Nẵng" || p === "Hải Phòng" || p === "Cần Thơ" ? 4 : 1))
+// Tỉnh → danh sách TCHNCC mô phỏng trong tỉnh đó (chỉ 3/34 tỉnh có TCHNCC mẫu — các tỉnh khác không gắn tổ chức cụ thể).
+const ORGS_BY_PROVINCE: Record<string, string[]> = {}
+TCHNCC_ORGS.forEach((o) => { (ORGS_BY_PROVINCE[ORG_PROVINCE[o]] ??= []).push(o) })
 
-export interface GdccRec { ngayCC: string; tinh: string; phuongThuc: string; loaiGD: string; trangThai: string }
-export const GDCC_RECORDS: GdccRec[] = Array.from({ length: 4200 }, () => ({
-  ngayCC: isoInRange("2020-01-01", D_MINUS_2),
-  tinh: pick(PROVINCES_34, PROVINCE_WEIGHTS),
-  phuongThuc: pick(["Công chứng giấy", "CCĐT trực tuyến", "CCĐT trực tiếp"], [65, 25, 10]),
-  loaiGD: pick(LOAI_GD_LIST, [35, 15, 25, 15, 10]),
-  trangThai: pick(["Có hiệu lực", "Đã hủy", "Vô hiệu"], [92, 5, 3]),
-}))
+export interface GdccRec { ngayCC: string; tinh: string; toChuc: string; phuongThuc: string; loaiGD: string; trangThai: string }
+export const GDCC_RECORDS: GdccRec[] = Array.from({ length: 4200 }, () => {
+  const tinh = pick(PROVINCES_34, PROVINCE_WEIGHTS)
+  return {
+    ngayCC: isoInRange("2020-01-01", D_MINUS_2),
+    tinh,
+    toChuc: ORGS_BY_PROVINCE[tinh] ? pick(ORGS_BY_PROVINCE[tinh]) : "",
+    phuongThuc: pick(["Công chứng giấy", "CCĐT trực tuyến", "CCĐT trực tiếp"], [65, 25, 10]),
+    loaiGD: pick(LOAI_GD_LIST, [35, 15, 25, 15, 10]),
+    trangThai: pick(["Có hiệu lực", "Đã hủy", "Vô hiệu"], [92, 5, 3]),
+  }
+})
 
 export interface TchnccRec { ngayThanhLap: string; tinh: string; trangThai: string }
 export const TCHNCC_RECORDS: TchnccRec[] = Array.from({ length: 420 }, () => ({
@@ -184,8 +203,25 @@ export const KHAITHAC_RECORDS: KhaiThacRec[] = Array.from({ length: 9000 }, () =
   loaiDuLieu: pick(LOAI_DU_LIEU_KHAITHAC, [30, 15, 10, 15, 10, 10, 10]),
 }))
 
+// C03 (A.7.3): hồ sơ scan/upload lưu trữ điện tử theo TCHNCC.
+export interface LuuTruRec { ngay: string; toChuc: string }
+export const LUUTRU_RECORDS: LuuTruRec[] = Array.from({ length: 3200 }, () => ({
+  ngay: isoInRange("2020-01-01", D_MINUS_2),
+  toChuc: pick(TCHNCC_ORGS),
+}))
+
+// B07 (A.7.3): yêu cầu khai thác chi tiết GDCC giữa các TCHNCC (nhận/gửi).
+export interface YeuCauKtRec { ngay: string; tuToChuc: string; denToChuc: string }
+export const YEUCAUKT_RECORDS: YeuCauKtRec[] = Array.from({ length: 900 }, () => {
+  const tuToChuc = pick(TCHNCC_ORGS)
+  let denToChuc = pick(TCHNCC_ORGS)
+  while (denToChuc === tuToChuc) denToChuc = pick(TCHNCC_ORGS)
+  return { ngay: isoInRange("2020-01-01", D_MINUS_2), tuToChuc, denToChuc }
+})
+
 /* ============================ TỔNG HỢP THEO PHẠM VI/KỲ ============================ */
 export const scopeByProvince = <T extends { tinh: string }>(rows: T[], province: string) => province === "Toàn quốc" ? rows : rows.filter((r) => r.tinh === province)
+export const scopeByOrg = <T extends { toChuc: string }>(rows: T[], org: string) => rows.filter((r) => r.toChuc === org)
 
 export function countInRange<T>(rows: T[], dateOf: (r: T) => string, from: string, to: string) {
   return rows.filter((r) => inRange(dateOf(r), from, to)).length

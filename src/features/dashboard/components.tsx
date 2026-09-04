@@ -3,14 +3,19 @@ import { Download, RefreshCw, ShieldX } from "lucide-react"
 
 import { NativeSelect } from "@/features/reconciliation/components/NativeSelect"
 import { PageHeader } from "../ingestion/shared"
-import { DASHBOARD_ROLES, isBoRole, type DashboardRole } from "./config"
+import { DASHBOARD_ROLES, isBoRole, isTchnccRole, type DashboardRole } from "./config"
 
 /* ============================ HEADER + VAI TRÒ (BR-01) ============================ */
 export function DashboardHeader({ role, onRole, actions }: { role: DashboardRole; onRole: (r: DashboardRole) => void; actions?: React.ReactNode }) {
   const bo = isBoRole(role)
+  const tchncc = isTchnccRole(role)
+  const scopeLabel = bo ? "Bộ Tư pháp" : tchncc ? "Tổ chức hành nghề công chứng" : "Sở Tư pháp"
+  const scopeDesc = bo ? "trên phạm vi toàn quốc" : tchncc ? "thuộc tổ chức hành nghề công chứng" : "trên địa bàn tỉnh/thành phố"
   return (
-    <PageHeader title={`Dashboard thông tin tổng hợp — ${bo ? "Bộ Tư pháp" : "Sở Tư pháp"}`}
-      desc={`Thống kê tổng quan TCHNCC, CCV, giao dịch công chứng và ngăn chặn/cảnh báo rủi ro ${bo ? "trên phạm vi toàn quốc" : "trên địa bàn tỉnh/thành phố"}.`}
+    <PageHeader title={`Dashboard thông tin tổng hợp — ${scopeLabel}`}
+      desc={tchncc
+        ? `Thống kê tổng quan hồ sơ công chứng, VBCC điện tử, hồ sơ lưu trữ điện tử và yêu cầu khai thác ${scopeDesc}.`
+        : `Thống kê tổng quan TCHNCC, CCV, giao dịch công chứng và ngăn chặn/cảnh báo rủi ro ${scopeDesc}.`}
       actions={
         <div className="flex items-center gap-3">
           {actions}
@@ -32,7 +37,7 @@ export function AccessGate({ role, children }: { role: DashboardRole; children: 
     <div className="flex flex-col items-center gap-3 rounded-[14px] border border-[#fecaca] bg-[#fef2f2] px-6 py-16 text-center">
       <div className="flex size-12 items-center justify-center rounded-full bg-[#fee2e2] text-[#b91c1c]"><ShieldX className="size-6" /></div>
       <div className="text-[15px] font-semibold text-[#b91c1c]">Bạn không có quyền truy cập.</div>
-      <div className="max-w-md text-[13px] text-[#b91c1c]/80">Dashboard thông tin tổng hợp chỉ dành cho tài khoản Lãnh đạo/Chuyên viên Bộ Tư pháp hoặc Lãnh đạo/Chuyên viên Sở Tư pháp.</div>
+      <div className="max-w-md text-[13px] text-[#b91c1c]/80">Dashboard thông tin tổng hợp chỉ dành cho tài khoản Lãnh đạo/Chuyên viên Bộ Tư pháp, Lãnh đạo/Chuyên viên Sở Tư pháp, hoặc Lãnh đạo TCHNCC/Công chứng viên.</div>
     </div>
   )
 }
