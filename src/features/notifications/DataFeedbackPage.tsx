@@ -70,7 +70,7 @@ export function DataFeedbackPage() {
                 key={t}
                 onClick={() => { setTab(t); setPage(1) }}
                 className={cn(
-                  "-mb-px border-b-[3px] px-3 py-2 text-[13.5px] outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50",
+                  "-mb-px border-b-4 px-3 py-2 text-[13.5px] outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/50",
                   tab === t ? "border-neutral-900 font-semibold text-foreground-strong" : "border-transparent font-medium text-foreground-muted hover:text-foreground"
                 )}
               >
