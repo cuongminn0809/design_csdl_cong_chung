@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { Download, RefreshCw, ShieldX } from "lucide-react"
 
 import { NativeSelect } from "@/features/reconciliation/components/NativeSelect"
@@ -80,17 +80,43 @@ export function ChartCard({ title, onExport, toggleLabel, onToggle, children, le
 export const PALETTE = ["#2563eb", "#059669", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#db2777"]
 const fmt = (n: number) => n.toLocaleString("vi-VN")
 
+/* ============================ BR-05: HOVER TOOLTIP (tên vùng dữ liệu + số lượng + %) ============================ */
+interface HoverTip { x: number; y: number; lines: string[] }
+function useHoverTip() {
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [tip, setTip] = useState<HoverTip | null>(null)
+  const show = (e: React.MouseEvent, lines: string[]) => {
+    const box = wrapRef.current?.getBoundingClientRect()
+    if (!box) return
+    setTip({ x: e.clientX - box.left, y: e.clientY - box.top, lines })
+  }
+  const hide = () => setTip(null)
+  return { wrapRef, tip, show, hide }
+}
+function HoverTipBox({ tip }: { tip: HoverTip | null }) {
+  if (!tip) return null
+  return (
+    <div className="pointer-events-none absolute z-20 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2.5 py-1.5 text-[11px] leading-tight text-white shadow-lg"
+      style={{ left: tip.x, top: tip.y - 12, transform: "translate(-50%, -100%)" }}>
+      {tip.lines.map((l, i) => <div key={i} className={i === 0 ? "font-semibold" : "text-neutral-200"}>{l}</div>)}
+    </div>
+  )
+}
+
 /* ============================ B01/B03: TRÒN ↔ CỘT ============================ */
 export function PieOrBar({ data, mode }: { data: { label: string; value: number; color: string }[]; mode: "pie" | "bar" }) {
   const total = data.reduce((s, d) => s + d.value, 0) || 1
+  const { wrapRef, tip, show, hide } = useHoverTip()
   if (mode === "bar") {
     const max = Math.max(...data.map((d) => d.value), 1)
     return (
-      <div className="flex h-[220px] items-end justify-around gap-3 px-2">
+      <div ref={wrapRef} className="relative flex h-[220px] items-end justify-around gap-3 px-2">
+        <HoverTipBox tip={tip} />
         {data.map((d) => (
           <div key={d.label} className="flex flex-1 flex-col items-center gap-1.5">
             <span className="text-[11px] font-medium tabular-nums text-foreground-strong">{fmt(d.value)}</span>
-            <div className="w-full max-w-14 rounded-t-md" style={{ height: `${(d.value / max) * 160}px`, background: d.color }} title={`${d.label} — Số lượng: ${fmt(d.value)} (${((d.value / total) * 100).toFixed(1)}%)`} />
+            <div className="w-full max-w-14 rounded-t-md" style={{ height: `${(d.value / max) * 160}px`, background: d.color }}
+              onMouseMove={(e) => show(e, [d.label, `Số lượng: ${fmt(d.value)}`, `Tỉ lệ: ${((d.value / total) * 100).toFixed(1)}%`])} onMouseLeave={hide} />
             <span className="text-center text-[11px] text-foreground-muted">{d.label}</span>
           </div>
         ))}
@@ -108,9 +134,11 @@ export function PieOrBar({ data, mode }: { data: { label: string; value: number;
     return { d: `M${C},${C} L${x1},${y1} A${R},${R} 0 ${large} 1 ${x2},${y2} Z`, ...d }
   })
   return (
-    <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+    <div ref={wrapRef} className="relative flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <HoverTipBox tip={tip} />
       <svg viewBox="0 0 180 180" className="h-[180px] w-[180px] shrink-0">
-        {slices.map((s) => <path key={s.label} d={s.d} fill={s.color} stroke="#fff" strokeWidth={1.5}><title>{`${s.label} — Số lượng: ${fmt(s.value)} (${((s.value / total) * 100).toFixed(1)}%)`}</title></path>)}
+        {slices.map((s) => <path key={s.label} d={s.d} fill={s.color} stroke="#fff" strokeWidth={1.5}
+          onMouseMove={(e) => show(e, [s.label, `Số lượng: ${fmt(s.value)}`, `Tỉ lệ: ${((s.value / total) * 100).toFixed(1)}%`])} onMouseLeave={hide} />)}
         <circle cx={C} cy={C} r={40} fill="var(--color-surface, #fff)" />
       </svg>
       <div className="space-y-1.5">
@@ -147,35 +175,48 @@ export function LineOrArea({ categories, series, mode, xLabel = "Thời gian", y
   const W = width, H = 240
   const n = categories.length
   const maxV = Math.max(1, ...series.flatMap((s) => s.data)) * 1.1
+  const total = series.reduce((s, ser) => s + ser.data.reduce((a, b) => a + b, 0), 0) || 1
   const x = (i: number) => AXIS_PAD.left + (i * (W - AXIS_PAD.left - AXIS_PAD.right)) / (Math.max(n, 2) - 1)
   const y = (v: number) => (H - AXIS_PAD.bottom) - (v / maxV) * (H - AXIS_PAD.top - AXIS_PAD.bottom)
   const step = Math.max(1, Math.ceil(n / 10))
+  const { wrapRef, tip, show, hide } = useHoverTip()
   if (!n || series.every((s) => s.data.every((v) => v === 0))) return <div className="flex h-[240px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
-      <YTicks W={W} H={H} maxV={maxV} />
-      {series.map((s) => {
-        const pts = s.data.map((v, i) => `${x(i)},${y(v)}`).join(" ")
-        return (
-          <g key={s.name}>
-            {mode === "area" && <polygon points={`${AXIS_PAD.left},${H - AXIS_PAD.bottom} ${pts} ${x(n - 1)},${H - AXIS_PAD.bottom}`} fill={s.color} opacity={0.12} />}
-            <polyline points={pts} fill="none" stroke={s.color} strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round" />
-            {s.data.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={2.75} fill="#fff" stroke={s.color} strokeWidth={2}><title>{`${s.name} — ${categories[i]}: ${fmt(v)}`}</title></circle>)}
-          </g>
-        )
-      })}
-      {categories.map((l, i) => (i % step === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - AXIS_PAD.bottom + 16} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
-      <AxisTitles W={W} H={H} xLabel={xLabel} yLabel={yLabel} />
-    </svg>
+    <div ref={wrapRef} className="relative">
+      <HoverTipBox tip={tip} />
+      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
+        <YTicks W={W} H={H} maxV={maxV} />
+        {series.map((s) => {
+          const pts = s.data.map((v, i) => `${x(i)},${y(v)}`).join(" ")
+          return (
+            <g key={s.name}>
+              {mode === "area" && <polygon points={`${AXIS_PAD.left},${H - AXIS_PAD.bottom} ${pts} ${x(n - 1)},${H - AXIS_PAD.bottom}`} fill={s.color} opacity={0.12} />}
+              <polyline points={pts} fill="none" stroke={s.color} strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round" />
+              {s.data.map((v, i) => (
+                <g key={i}>
+                  <circle cx={x(i)} cy={y(v)} r={2.75} fill="#fff" stroke={s.color} strokeWidth={2} />
+                  <circle cx={x(i)} cy={y(v)} r={9} fill="transparent"
+                    onMouseMove={(e) => show(e, [`${s.name} — ${categories[i]}`, `Số lượng: ${fmt(v)}`, `Tỉ lệ: ${((v / total) * 100).toFixed(1)}%`])} onMouseLeave={hide} />
+                </g>
+              ))}
+            </g>
+          )
+        })}
+        {categories.map((l, i) => (i % step === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - AXIS_PAD.bottom + 16} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+        <AxisTitles W={W} H={H} xLabel={xLabel} yLabel={yLabel} />
+      </svg>
+    </div>
   )
 }
 
 /* ============================ B09/B10: ĐƯỜNG NHIỀU SERIES ↔ CỘT XẾP CHỒNG ============================ */
 export function LineOrStackedBar({ categories, series, mode, xLabel = "Thời gian", yLabel = "Số lượng" }: { categories: string[]; series: { name: string; color: string; data: number[] }[]; mode: "line" | "stackedBar"; xLabel?: string; yLabel?: string }) {
+  const { wrapRef, tip, show, hide } = useHoverTip()
   if (mode === "line") return <LineOrArea categories={categories} series={series} mode="line" xLabel={xLabel} yLabel={yLabel} />
   const W = 760, H = 240
   const n = categories.length
   const totals = categories.map((_, i) => series.reduce((s, ser) => s + ser.data[i], 0))
+  const grandTotal = totals.reduce((a, b) => a + b, 0) || 1
   const maxV = Math.max(1, ...totals) * 1.1
   const innerW = W - AXIS_PAD.left - AXIS_PAD.right
   const bw = Math.min(36, innerW / Math.max(n, 1) - 8)
@@ -183,20 +224,24 @@ export function LineOrStackedBar({ categories, series, mode, xLabel = "Thời gi
   const y = (v: number) => (H - AXIS_PAD.bottom) - (v / maxV) * (H - AXIS_PAD.top - AXIS_PAD.bottom)
   if (!n || totals.every((t) => t === 0)) return <div className="flex h-[240px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
-      <YTicks W={W} H={H} maxV={maxV} />
-      {categories.map((_, i) => {
-        let acc = 0
-        return series.map((s) => {
-          const v = s.data[i]
-          const yTop = y(acc + v), yBottom = y(acc)
-          acc += v
-          return <rect key={s.name} x={x(i)} y={yTop} width={bw} height={Math.max(0, yBottom - yTop)} fill={s.color}><title>{`${s.name} — ${categories[i]}: ${fmt(v)}`}</title></rect>
-        })
-      })}
-      {categories.map((l, i) => <text key={i} x={x(i) + bw / 2} y={H - AXIS_PAD.bottom + 16} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
-      <AxisTitles W={W} H={H} xLabel={xLabel} yLabel={yLabel} />
-    </svg>
+    <div ref={wrapRef} className="relative">
+      <HoverTipBox tip={tip} />
+      <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
+        <YTicks W={W} H={H} maxV={maxV} />
+        {categories.map((_, i) => {
+          let acc = 0
+          return series.map((s) => {
+            const v = s.data[i]
+            const yTop = y(acc + v), yBottom = y(acc)
+            acc += v
+            return <rect key={s.name} x={x(i)} y={yTop} width={bw} height={Math.max(0, yBottom - yTop)} fill={s.color}
+              onMouseMove={(e) => show(e, [`${s.name} — ${categories[i]}`, `Số lượng: ${fmt(v)}`, `Tỉ lệ: ${((v / grandTotal) * 100).toFixed(1)}%`])} onMouseLeave={hide} />
+          })
+        })}
+        {categories.map((l, i) => <text key={i} x={x(i) + bw / 2} y={H - AXIS_PAD.bottom + 16} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+        <AxisTitles W={W} H={H} xLabel={xLabel} yLabel={yLabel} />
+      </svg>
+    </div>
   )
 }
 
@@ -232,13 +277,16 @@ export function HorizontalBarOrTable({ data, mode }: { data: ProvinceDist[]; mod
   }
   const top = data.slice(0, 15)
   const max = Math.max(1, ...top.map((d) => d.total))
+  const { wrapRef, tip, show, hide } = useHoverTip()
   return (
-    <div className="space-y-2">
+    <div ref={wrapRef} className="relative space-y-2">
+      <HoverTipBox tip={tip} />
       {top.map((d) => (
         <div key={d.tinh} className="flex items-center gap-3">
           <span className="w-28 shrink-0 truncate text-[12px] text-foreground-muted" title={d.tinh}>{d.tinh}</span>
           <div className="h-3 flex-1 overflow-hidden rounded-full bg-neutral-100">
-            <div className="h-full rounded-full bg-[#2563eb]" style={{ width: `${(d.total / max) * 100}%` }} title={`${d.tinh} — Số lượng: ${fmt(d.total)} (${((d.total / totalAll) * 100).toFixed(1)}%)`} />
+            <div className="h-full rounded-full bg-[#2563eb]" style={{ width: `${(d.total / max) * 100}%` }}
+              onMouseMove={(e) => show(e, [d.tinh, `Số lượng: ${fmt(d.total)}`, `Tỉ lệ: ${((d.total / totalAll) * 100).toFixed(1)}%`])} onMouseLeave={hide} />
           </div>
           <span className="w-16 shrink-0 text-right text-[12px] tabular-nums text-foreground-strong">{fmt(d.total)}</span>
         </div>
