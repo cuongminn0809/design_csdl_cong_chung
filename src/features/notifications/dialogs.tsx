@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
+import { createPortal } from "react-dom"
 import { useNavigate } from "react-router-dom"
 import { Download, ExternalLink, Trash2, X } from "lucide-react"
 
@@ -15,7 +16,10 @@ import {
 } from "./config"
 
 function Modal({ title, wide, onClose, footer, children }: { title: string; wide?: boolean; onClose: () => void; footer?: React.ReactNode; children: React.ReactNode }) {
-  return (
+  // Portal ra document.body: chuông thông báo nằm trong <header> có backdrop-blur, mà
+  // backdrop-filter trên tổ tiên tạo containing block mới cho phần tử fixed — nếu không
+  // portal, modal sẽ định vị theo khung header thay vì toàn viewport.
+  return createPortal(
     <div className="fixed inset-0 z-[140] flex items-center justify-center bg-[rgba(10,10,10,0.5)] p-6" onClick={onClose}>
       <div className={cn("flex max-h-[88vh] w-full flex-col overflow-hidden rounded-xl bg-surface shadow-popover", wide ? "max-w-[720px]" : "max-w-[520px]")} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
@@ -25,7 +29,8 @@ function Modal({ title, wide, onClose, footer, children }: { title: string; wide
         <div className="flex-1 overflow-y-auto px-6 py-5">{children}</div>
         {footer && <div className="flex justify-end gap-2 border-t border-border px-6 py-4">{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 function Field({ label, value }: { label: string; value?: React.ReactNode }) {
