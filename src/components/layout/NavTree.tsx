@@ -35,7 +35,7 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
           )
         }
         style={{ paddingLeft: 10 + depth * 14 }}
-        end={item.path === "/"}
+        end
       >
         {item.icon && <item.icon className="size-[15px] shrink-0" />}
         <span className="truncate">{item.label}</span>
