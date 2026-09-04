@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/features/reconciliation/components/Toast"
-import { EmptyState, PageHeader } from "../ingestion/shared"
+import { EmptyState } from "../ingestion/shared"
 import { NOTI_GROUPS, NOTI_ROLES, saveSubscriptions, setCurrentRole, useCurrentRole, useSubscriptions } from "./config"
 
 export function SubscribePage() {
@@ -29,16 +29,21 @@ export function SubscribePage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Đăng ký nhận thông báo" desc="Chọn các nhóm thông tin bạn muốn nhận thông báo. Áp dụng ngay sau khi lưu, không ảnh hưởng thông báo đã gửi trước đó."
-        actions={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate("/tien-ich/thong-bao")}><ArrowLeft className="size-4" />Quay lại</Button>
-            <span className="text-[12.5px] text-foreground-muted">Vai trò:</span>
-            <select value={role} onChange={(e) => setCurrentRole(e.target.value as typeof role)} className="h-8 w-[220px] cursor-pointer rounded-md border border-input bg-surface px-2 text-[12.5px]">
-              {NOTI_ROLES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
-            </select>
+      <div className="mb-1 flex items-end justify-between gap-5">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate("/tien-ich/thong-bao")} className="flex size-9 items-center justify-center rounded-md border border-border bg-surface text-foreground-muted shadow-xs hover:bg-surface-muted"><ArrowLeft className="size-4" /></button>
+          <div>
+            <h3 className="text-[24px] font-semibold leading-tight tracking-[-0.02em] text-foreground-strong">Đăng ký nhận thông báo</h3>
+            <p className="mt-1.5 text-sm text-foreground-muted">Chọn các nhóm thông tin bạn muốn nhận thông báo. Áp dụng ngay sau khi lưu, không ảnh hưởng thông báo đã gửi trước đó.</p>
           </div>
-        } />
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="text-[12.5px] text-foreground-muted">Vai trò:</span>
+          <select value={role} onChange={(e) => setCurrentRole(e.target.value as typeof role)} className="h-8 w-[220px] cursor-pointer rounded-md border border-input bg-surface px-2 text-[12.5px]">
+            {NOTI_ROLES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
+          </select>
+        </div>
+      </div>
 
       <div className="overflow-hidden rounded-[14px] border border-border bg-surface shadow-sm">
         {groups.length ? (
