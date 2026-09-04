@@ -53,7 +53,8 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
             end
             className={({ isActive }) =>
               cn(
-                "flex flex-1 items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-surface-muted",
+                // paddingLeft đã áp dụng ở wrapper (dòng trên) — chỉ giữ pr-2.5 ở đây để tránh cộng dồn thụt lề.
+                "flex flex-1 items-center gap-2.5 rounded-md py-1.5 pr-2.5 text-sm font-medium transition-colors hover:bg-surface-muted",
                 isActive ? "bg-neutral-900 text-neutral-50 hover:bg-neutral-900" : active ? "text-foreground-strong" : "text-foreground-muted"
               )
             }
