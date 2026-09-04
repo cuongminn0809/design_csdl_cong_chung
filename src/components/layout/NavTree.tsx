@@ -25,6 +25,7 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
     return (
       <NavLink
         to={item.path}
+        title={item.label}
         className={({ isActive }) =>
           cn(
             "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm outline-none transition-colors",
@@ -51,6 +52,7 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
           <NavLink
             to={item.path}
             end
+            title={item.label}
             className={({ isActive }) =>
               cn(
                 // Thụt lề theo depth nằm ở marginLeft của wrapper (không tô màu); px-2.5 ở đây tạo khoảng đệm bên trong nền pill khi active.
@@ -75,6 +77,7 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
         <button
           type="button"
           onClick={onToggle}
+          title={item.label}
           className={cn(
             "flex w-full items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left text-sm font-medium outline-none transition-colors hover:bg-surface-muted focus-visible:ring-[3px] focus-visible:ring-ring/50",
             active ? "text-foreground-strong" : "text-foreground-muted"
