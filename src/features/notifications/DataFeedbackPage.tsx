@@ -54,7 +54,7 @@ export function DataFeedbackPage() {
         actions={
           <div className="flex items-center gap-2">
             <span className="text-[12.5px] text-foreground-muted">Vai trò:</span>
-            <select value={role} onChange={(e) => setCurrentRole(e.target.value as typeof role)} className="h-8 w-[220px] cursor-pointer rounded-md border border-input bg-surface px-2 text-[12.5px]">
+            <select value={role} onChange={(e) => setCurrentRole(e.target.value as typeof role)} className="h-8 w-[220px] cursor-pointer rounded-md border border-input bg-surface px-2 text-[12.5px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
               {NOTI_ROLES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
             </select>
           </div>

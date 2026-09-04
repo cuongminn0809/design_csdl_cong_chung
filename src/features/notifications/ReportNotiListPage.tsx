@@ -44,12 +44,12 @@ export function ReportNotiListPage() {
     <div className="space-y-4">
       <PageHeader title="Thông báo đợt báo cáo" desc="Tạo lập, phát hành và theo dõi thông báo nhắc nộp số liệu báo cáo hoạt động công chứng."
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <span className="text-[12.5px] text-foreground-muted">Vai trò:</span>
-            <select value={role} onChange={(e) => setCurrentRole(e.target.value as typeof role)} className="h-8 w-[220px] cursor-pointer rounded-md border border-input bg-surface px-2 text-[12.5px]">
+            <select value={role} onChange={(e) => setCurrentRole(e.target.value as typeof role)} className="h-8 w-[220px] cursor-pointer rounded-md border border-input bg-surface px-2 text-[12.5px] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
               {NOTI_ROLES.map((r) => <option key={r.key} value={r.key}>{r.label}</option>)}
             </select>
-            {canManage && <Button size="sm" onClick={() => setPopup({ type: "form" })}><Plus className="size-4" />Thêm mới</Button>}
+            {canManage && <Button size="sm" className="ml-1.5" onClick={() => setPopup({ type: "form" })}><Plus className="size-4" />Thêm mới</Button>}
           </div>
         } />
 
