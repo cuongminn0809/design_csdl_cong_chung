@@ -3,6 +3,7 @@ import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
   LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList, FileSpreadsheet, Landmark,
   Activity, Server, DownloadCloud, SprayCan, Wand2, GitMerge, SearchCheck, FileStack,
+  HelpCircle, UserRound, KeyRound, Wrench,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -146,6 +147,9 @@ export const SUBSYSTEMS: Subsystem[] = [
           { type: "leaf", label: "Vai trò & phân quyền", path: "/quan-tri/vai-tro-phan-quyen" },
           { type: "leaf", label: "Phiên đăng nhập", path: "/quan-tri/phien-dang-nhap" },
           { type: "leaf", label: "Danh mục trạng thái NSD", path: "/quan-tri/trang-thai-nguoi-dung" },
+          { type: "leaf", label: "Hồ sơ tài khoản của tôi", path: "/quan-tri/ho-so-tai-khoan", icon: UserRound },
+          { type: "leaf", label: "Lịch sử thao tác cá nhân", path: "/quan-tri/lich-su-ca-nhan", icon: History },
+          { type: "leaf", label: "Phiên đăng nhập của tôi", path: "/quan-tri/phien-dang-nhap-ca-nhan", icon: KeyRound },
         ],
       },
       {
@@ -164,7 +168,16 @@ export const SUBSYSTEMS: Subsystem[] = [
     code: "csdlcc",
     label: "Cơ sở dữ liệu công chứng",
     nav: [
-      { type: "leaf", label: "Dashboard tổng hợp", path: "/dashboard", icon: LayoutDashboard },
+      { type: "leaf", label: "Tiện ích", path: "/tien-ich", icon: Wrench },
+      {
+        type: "group",
+        label: "Dashboard tổng hợp",
+        path: "/dashboard",
+        icon: LayoutDashboard,
+        children: [
+          { type: "leaf", label: "Hoạt động gần đây", path: "/dashboard/hoat-dong-gan-day", icon: Activity },
+        ],
+      },
       {
         type: "group",
         label: "Quản lý giao dịch công chứng",
@@ -224,6 +237,8 @@ export const SUBSYSTEMS: Subsystem[] = [
         defaultOpen: true,
         children: [
           { type: "leaf", label: "Tra cứu phục vụ công chứng", path: "/exploit-info/notary-transaction-search", icon: Search },
+          { type: "leaf", label: "Hướng dẫn sử dụng", path: "/tra-cuu/huong-dan-su-dung", icon: FileText },
+          { type: "leaf", label: "Câu hỏi thường gặp", path: "/tra-cuu/faq", icon: HelpCircle },
           {
             type: "group",
             label: "Công chứng viên và TCHNCC",

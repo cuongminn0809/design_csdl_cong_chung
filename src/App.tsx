@@ -78,6 +78,14 @@ import { DataPostcheckPage } from "@/features/adminReport/DataPostcheckPage"
 import { DashboardPage as BtpStpDashboardPage } from "@/features/dashboard/DashboardPage"
 import { DataProvideRequestListPage } from "@/features/dataProvideRequest/DataProvideRequestListPage"
 import { DataProvideRequestStatsPage } from "@/features/dataProvideRequest/DataProvideRequestStatsPage"
+import { UtilitiesHubPage } from "@/features/utilities/UtilitiesHubPage"
+import { AccountProfilePage } from "@/features/utilities/AccountProfilePage"
+import { InstructionListPage } from "@/features/utilities/InstructionListPage"
+import { InstructionDetailPage } from "@/features/utilities/InstructionDetailPage"
+import { FaqListPage } from "@/features/utilities/FaqListPage"
+import { RecentActivitiesPage } from "@/features/utilities/RecentActivitiesPage"
+import { PersonalHistoryPage } from "@/features/utilities/PersonalHistoryPage"
+import { PersonalSessionsPage } from "@/features/utilities/PersonalSessionsPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -111,6 +119,11 @@ const REAL_ROUTES = new Set([
   "/quan-tri/nhom-nguoi-dung",
   "/quan-tri/phien-dang-nhap",
   "/quan-tri/vai-tro-phan-quyen",
+  "/tien-ich",
+  "/quan-tri/ho-so-tai-khoan",
+  "/quan-tri/lich-su-ca-nhan",
+  "/quan-tri/phien-dang-nhap-ca-nhan",
+  "/dashboard/hoat-dong-gan-day",
 ])
 
 function App() {
@@ -206,8 +219,16 @@ function App() {
         <Route path="/admin-report/data-reconciliation" element={<DataReconciliationPage />} />
         <Route path="/admin-report/data-postcheck" element={<DataPostcheckPage />} />
         <Route path="/dashboard" element={<BtpStpDashboardPage />} />
+        <Route path="/dashboard/hoat-dong-gan-day" element={<RecentActivitiesPage />} />
         <Route path="/data-provide-request" element={<DataProvideRequestListPage />} />
         <Route path="/data-provide-request/stats" element={<DataProvideRequestStatsPage />} />
+        <Route path="/tien-ich" element={<UtilitiesHubPage />} />
+        <Route path="/quan-tri/ho-so-tai-khoan" element={<AccountProfilePage />} />
+        <Route path="/quan-tri/lich-su-ca-nhan" element={<PersonalHistoryPage />} />
+        <Route path="/quan-tri/phien-dang-nhap-ca-nhan" element={<PersonalSessionsPage />} />
+        <Route path="/tra-cuu/huong-dan-su-dung" element={<InstructionListPage />} />
+        <Route path="/tra-cuu/huong-dan-su-dung/:id" element={<InstructionDetailPage />} />
+        <Route path="/tra-cuu/faq" element={<FaqListPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}
