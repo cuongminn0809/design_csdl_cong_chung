@@ -1,12 +1,20 @@
 /* ============================ VAI TRÒ (BR-01) ============================ */
-export type DashboardRole = "ld_btp" | "ld_cuc_bttp" | "cv_btp" | "khac"
+// A.7.1 (cấp BTP): ld_btp/ld_cuc_bttp/cv_btp — xem toàn quốc + lọc Tỉnh/TP.
+// A.7.2 (cấp STP): ld_stp/cv_stp — xem theo địa bàn cố định của người dùng, không có bộ lọc Tỉnh/TP (BR-09).
+export type DashboardRole = "ld_btp" | "ld_cuc_bttp" | "cv_btp" | "ld_stp" | "cv_stp" | "khac"
 export const DASHBOARD_ROLES: { key: DashboardRole; label: string }[] = [
   { key: "ld_btp", label: "Lãnh đạo Bộ Tư pháp" },
   { key: "ld_cuc_bttp", label: "Lãnh đạo Cục BTTP" },
   { key: "cv_btp", label: "Chuyên viên Cục BTTP" },
-  { key: "khac", label: "Sở Tư pháp (không có quyền)" },
+  { key: "ld_stp", label: "Lãnh đạo phòng chuyên môn STP" },
+  { key: "cv_stp", label: "Chuyên viên Sở Tư pháp" },
+  { key: "khac", label: "Vai trò khác (không có quyền)" },
 ]
 export const canAccessDashboard = (r: DashboardRole) => r !== "khac"
+export const isBoRole = (r: DashboardRole) => r === "ld_btp" || r === "ld_cuc_bttp" || r === "cv_btp"
+export const isStpRole = (r: DashboardRole) => r === "ld_stp" || r === "cv_stp"
+// Địa bàn tỉnh/thành phố cố định của tài khoản STP demo (BR-09) — khớp quy ước "Sở Tư pháp Hà Nội" đã dùng ở các module khác.
+export const STP_PROVINCE = "Hà Nội"
 
 /* ============================ DANH MỤC ĐỊA BÀN (34 Tỉnh/TP theo địa chỉ mới) ============================ */
 export const PROVINCES_34 = [

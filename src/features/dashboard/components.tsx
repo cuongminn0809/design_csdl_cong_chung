@@ -3,12 +3,14 @@ import { Download, RefreshCw, ShieldX } from "lucide-react"
 
 import { NativeSelect } from "@/features/reconciliation/components/NativeSelect"
 import { PageHeader } from "../ingestion/shared"
-import { DASHBOARD_ROLES, type DashboardRole } from "./config"
+import { DASHBOARD_ROLES, isBoRole, type DashboardRole } from "./config"
 
 /* ============================ HEADER + VAI TRÒ (BR-01) ============================ */
 export function DashboardHeader({ role, onRole, actions }: { role: DashboardRole; onRole: (r: DashboardRole) => void; actions?: React.ReactNode }) {
+  const bo = isBoRole(role)
   return (
-    <PageHeader title="Dashboard thông tin tổng hợp — Bộ Tư pháp" desc="Thống kê tổng quan TCHNCC, CCV, giao dịch công chứng và ngăn chặn/cảnh báo rủi ro trên phạm vi toàn quốc."
+    <PageHeader title={`Dashboard thông tin tổng hợp — ${bo ? "Bộ Tư pháp" : "Sở Tư pháp"}`}
+      desc={`Thống kê tổng quan TCHNCC, CCV, giao dịch công chứng và ngăn chặn/cảnh báo rủi ro ${bo ? "trên phạm vi toàn quốc" : "trên địa bàn tỉnh/thành phố"}.`}
       actions={
         <div className="flex items-center gap-3">
           {actions}
@@ -23,14 +25,14 @@ export function DashboardHeader({ role, onRole, actions }: { role: DashboardRole
   )
 }
 
-/** BR-01/VR-07: chặn truy cập khi tài khoản không thuộc Bộ Tư pháp (MSG_E-000701_001). */
+/** BR-01/VR-07 (A.7.1) và BR-01/VR-06 (A.7.2): chặn truy cập khi tài khoản không thuộc BTP/STP (MSG_E-000701_001/MSG_E-000702_001). */
 export function AccessGate({ role, children }: { role: DashboardRole; children: React.ReactNode }) {
   if (role !== "khac") return <>{children}</>
   return (
     <div className="flex flex-col items-center gap-3 rounded-[14px] border border-[#fecaca] bg-[#fef2f2] px-6 py-16 text-center">
       <div className="flex size-12 items-center justify-center rounded-full bg-[#fee2e2] text-[#b91c1c]"><ShieldX className="size-6" /></div>
       <div className="text-[15px] font-semibold text-[#b91c1c]">Bạn không có quyền truy cập.</div>
-      <div className="max-w-md text-[13px] text-[#b91c1c]/80">Dashboard thông tin tổng hợp cấp Bộ Tư pháp chỉ dành cho tài khoản Lãnh đạo Bộ Tư pháp, Lãnh đạo Cục BTTP hoặc Chuyên viên Cục BTTP.</div>
+      <div className="max-w-md text-[13px] text-[#b91c1c]/80">Dashboard thông tin tổng hợp chỉ dành cho tài khoản Lãnh đạo/Chuyên viên Bộ Tư pháp hoặc Lãnh đạo/Chuyên viên Sở Tư pháp.</div>
     </div>
   )
 }

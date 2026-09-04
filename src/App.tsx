@@ -75,7 +75,7 @@ import { DataCleansingPage } from "@/features/adminReport/DataCleansingPage"
 import { DataNormalizationPage } from "@/features/adminReport/DataNormalizationPage"
 import { DataReconciliationPage } from "@/features/adminReport/DataReconciliationPage"
 import { DataPostcheckPage } from "@/features/adminReport/DataPostcheckPage"
-import { BtpDashboardPage } from "@/features/dashboard/BtpDashboardPage"
+import { DashboardPage as BtpStpDashboardPage } from "@/features/dashboard/DashboardPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -203,7 +203,7 @@ function App() {
         <Route path="/admin-report/data-normalization" element={<DataNormalizationPage />} />
         <Route path="/admin-report/data-reconciliation" element={<DataReconciliationPage />} />
         <Route path="/admin-report/data-postcheck" element={<DataPostcheckPage />} />
-        <Route path="/dashboard" element={<BtpDashboardPage />} />
+        <Route path="/dashboard" element={<BtpStpDashboardPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

@@ -164,7 +164,7 @@ export const SUBSYSTEMS: Subsystem[] = [
     code: "csdlcc",
     label: "Cơ sở dữ liệu công chứng",
     nav: [
-      { type: "leaf", label: "Dashboard tổng hợp (BTP)", path: "/dashboard", icon: LayoutDashboard },
+      { type: "leaf", label: "Dashboard tổng hợp", path: "/dashboard", icon: LayoutDashboard },
       {
         type: "group",
         label: "Quản lý giao dịch công chứng",
