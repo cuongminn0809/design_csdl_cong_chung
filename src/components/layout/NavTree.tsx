@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { NavLink, useLocation } from "react-router-dom"
 import { ChevronRight } from "lucide-react"
 
@@ -11,10 +11,15 @@ function isActivePath(pathname: string, item: NavItem): boolean {
   return item.children.some((c) => isActivePath(pathname, c))
 }
 
-function NavNode({ item, depth }: { item: NavItem; depth: number }) {
+// Tìm sibling đang chứa route hiện tại (accordion: chỉ 1 nhánh chứa lựa chọn hiện tại được mở ở mỗi cấp).
+function findActiveIndex(items: NavItem[], pathname: string): number | null {
+  const i = items.findIndex((it) => isActivePath(pathname, it))
+  return i === -1 ? null : i
+}
+
+function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number; open: boolean; onToggle: () => void }) {
   const location = useLocation()
   const active = isActivePath(location.pathname, item)
-  const [open, setOpen] = useState(active || (item.type === "group" && !!item.defaultOpen))
 
   if (item.type === "leaf") {
     return (
@@ -58,7 +63,7 @@ function NavNode({ item, depth }: { item: NavItem; depth: number }) {
           </NavLink>
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
+            onClick={onToggle}
             aria-label={open ? "Thu gọn" : "Mở rộng"}
             className="flex size-7 shrink-0 items-center justify-center rounded-md text-foreground-subtle transition-colors hover:bg-surface-muted"
           >
@@ -68,7 +73,7 @@ function NavNode({ item, depth }: { item: NavItem; depth: number }) {
       ) : (
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={onToggle}
           className={cn(
             "flex w-full items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left text-sm font-medium transition-colors hover:bg-surface-muted",
             active ? "text-foreground-strong" : "text-foreground-muted"
@@ -90,21 +95,42 @@ function NavNode({ item, depth }: { item: NavItem; depth: number }) {
           className="mt-0.5 flex flex-col gap-0.5 border-l border-border"
           style={{ marginLeft: 14, paddingLeft: 8 }}
         >
-          {item.children.map((child, i) => (
-            <NavNode key={i} item={child} depth={0} />
-          ))}
+          <NavGroupList items={item.children} depth={0} />
         </div>
       )}
     </div>
   )
 }
 
+/** Danh sách sibling dùng chung 1 state accordion: chỉ 1 nhánh được mở tại mỗi cấp, tự đồng bộ theo route hiện tại. */
+function NavGroupList({ items, depth }: { items: NavItem[]; depth: number }) {
+  const location = useLocation()
+  const [openIndex, setOpenIndex] = useState<number | null>(() => findActiveIndex(items, location.pathname))
+
+  useEffect(() => {
+    setOpenIndex(findActiveIndex(items, location.pathname))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname])
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      {items.map((item, i) => (
+        <NavNode
+          key={i}
+          item={item}
+          depth={depth}
+          open={openIndex === i}
+          onToggle={() => setOpenIndex((cur) => (cur === i ? null : i))}
+        />
+      ))}
+    </div>
+  )
+}
+
 export function NavTree({ items }: { items: NavItem[] }) {
   return (
-    <nav className="flex flex-col gap-0.5">
-      {items.map((item, i) => (
-        <NavNode key={i} item={item} depth={0} />
-      ))}
+    <nav>
+      <NavGroupList items={items} depth={0} />
     </nav>
   )
 }
