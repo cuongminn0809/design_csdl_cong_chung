@@ -236,8 +236,73 @@ export function sumByBucketSeries<T>(rows: T[], dateOf: (r: T) => string, series
   }))
 }
 
-/* ============================ KẾT XUẤT (BR-06) ============================ */
+/* ============================ KẾT XUẤT BIỂU ĐỒ ĐƠN LẺ (BR-06, A.7.1/A.7.2/A.7.3) ============================ */
 export function exportMsg(count: number): { msg: string; kind: "ok" | "error" } {
   if (count === 0) return { msg: "Không có dữ liệu theo bộ lọc đã chọn.", kind: "error" }
   return { msg: "Đã xuất biểu đồ thành công. Tệp đã được tải về máy của bạn.", kind: "ok" }
+}
+
+/* ============================ A.7.4: CẤU HÌNH HIỂN THỊ DASHBOARD ============================ */
+export type WidgetWidth = "30" | "50" | "100"
+export interface WidgetConfig { visible: boolean; customName: string; order: number; width: WidgetWidth }
+export type DashboardType = "BTP" | "STP" | "TCHNCC"
+export const dashboardTypeOf = (role: DashboardRole): DashboardType => isBoRole(role) ? "BTP" : isTchnccRole(role) ? "TCHNCC" : "STP"
+
+// BR-02/BR-03: auto-save cấu hình hiển thị vào localStorage, persistent per trình duyệt (mô phỏng "gắn với tài khoản").
+const configKey = (type: DashboardType) => `dashboard_config_${type}`
+export function loadWidgetConfigs(type: DashboardType): Record<string, WidgetConfig> | null {
+  try {
+    const raw = localStorage.getItem(configKey(type))
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
+export function saveWidgetConfigs(type: DashboardType, configs: Record<string, WidgetConfig>) {
+  try { localStorage.setItem(configKey(type), JSON.stringify(configs)) } catch { /* ignore quota/storage errors */ }
+}
+export function clearWidgetConfigs(type: DashboardType) {
+  try { localStorage.removeItem(configKey(type)) } catch { /* ignore */ }
+}
+
+// VR-01/BR-05: tên widget tùy chỉnh — tối đa 50 ký tự, không chứa ký tự đặc biệt.
+export function validateWidgetName(name: string): string {
+  if (name.length > 50) return "Tên widget không hợp lệ (tối đa 50 ký tự, không chứa ký tự đặc biệt)."
+  if (/[<>"\\]/.test(name)) return "Tên widget không hợp lệ (tối đa 50 ký tự, không chứa ký tự đặc biệt)."
+  return ""
+}
+
+/* ============================ A.7.4: KẾT XUẤT BÁO CÁO TOÀN BỘ DASHBOARD (BR-09/BR-10) ============================ */
+export const EXPORT_TIME_PRESETS = ["Năm nay", "Quý này", "Tháng này", "Tuần này", "Tùy chọn"] as const
+export type ExportTimePreset = (typeof EXPORT_TIME_PRESETS)[number]
+export const EXPORT_FORMATS = ["PDF", "PNG", "JPG", "Excel"] as const
+export type ExportFormat = (typeof EXPORT_FORMATS)[number]
+
+export interface ExportFilterState { preset: ExportTimePreset; tuNgay: string; denNgay: string; province: string; format: ExportFormat }
+
+// VR-02/VR-03: F01 bắt buộc chọn; nếu Tùy chọn thì F02/F03 bắt buộc và F03 >= F02.
+export function validateExportFilter(f: ExportFilterState): string {
+  if (!f.preset) return "Vui lòng chọn phạm vi thời gian kết xuất."
+  if (f.preset === "Tùy chọn") {
+    if (!f.tuNgay || !f.denNgay) return "Vui lòng chọn khoảng thời gian hợp lệ (Từ ngày ≤ Đến ngày)."
+    if (f.tuNgay > f.denNgay) return "Vui lòng chọn khoảng thời gian hợp lệ (Từ ngày ≤ Đến ngày)."
+  }
+  return ""
+}
+
+// Quy đổi preset kết xuất → khoảng ngày cụ thể (dựa trên D-2 giống bộ lọc dashboard).
+export function resolveExportRange(f: ExportFilterState): ResolvedRange {
+  const y = CURRENT_YEAR
+  const today = new Date(TODAY_ISO)
+  if (f.preset === "Tùy chọn") return { from: f.tuNgay, to: f.denNgay, label: `${fmtVN(f.tuNgay)} – ${fmtVN(f.denNgay)}` }
+  if (f.preset === "Năm nay") return resolveRange({ ...DEFAULT_FILTER, year: y, kind: "ca-nam" })
+  if (f.preset === "Quý này") { const q = Math.floor(today.getMonth() / 3) + 1; return resolveRange({ ...DEFAULT_FILTER, year: y, kind: "theo-quy", quarter: q }) }
+  if (f.preset === "Tháng này") return resolveRange({ ...DEFAULT_FILTER, year: y, kind: "theo-thang", month: today.getMonth() + 1 })
+  // "Tuần này": 7 ngày gần nhất tính đến D-2.
+  const to = D_MINUS_2
+  const from = new Date(new Date(to).getTime() - 6 * 86_400_000).toISOString().slice(0, 10)
+  return { from, to, label: `${fmtVN(from)} – ${fmtVN(to)}` }
+}
+
+// STT 2 (A.7.4-02): tên file kết xuất — BaoCao_Dashboard_{cap}_{dinhDang}_{yyyyMMddHHmm}.
+export function exportReportFileName(cap: DashboardType, format: ExportFormat) {
+  return `BaoCao_Dashboard_${cap}_${format}_202608281430`
 }

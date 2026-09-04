@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { AlertTriangle, Archive, Building2, FileText, MapPin, Settings2, ShieldAlert, Users } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -7,21 +7,28 @@ import { useToast } from "@/features/reconciliation/components/Toast"
 import { NativeSelect } from "@/features/reconciliation/components/NativeSelect"
 import { inputCls } from "../ingestion/shared"
 import {
-  AccessGate, ChartCard, DashboardHeader, F, HorizontalBarOrTable, LineOrArea, LineOrStackedBar, PALETTE, PieOrBar, StatCard, useToggle,
-  type ProvinceDist,
+  AccessGate, ChartCard, ConfigPanel, DashboardHeader, ExportDialog, F, HorizontalBarOrTable, LineOrArea, LineOrStackedBar, PALETTE, PieOrBar, StatCard, WidgetGrid, useToggle,
+  type ProvinceDist, type WidgetMeta,
 } from "./components"
 import {
   CCV_RECORDS, DEFAULT_FILTER, DON_VI_KHAITHAC, GDCC_RECORDS, KHAITHAC_RECORDS, LOAI_DU_LIEU_KHAITHAC, LOAI_GD_LIST, LOAI_TAISAN_LIST, LUUTRU_RECORDS,
   NGANCHAN_RECORDS, PERIOD_KINDS, PROVINCES_34, QUARTERS, MONTHS, STP_PROVINCE, TCHNCC_HOME_ORG, TCHNCC_RECORDS, YEAR_OPTIONS, YEUCAUKT_RECORDS,
-  buildBuckets, countInRange, exportMsg, fmtVN, inRange, isBoRole, isTchnccRole, resolveRange, scopeByOrg, scopeByProvince, sumByBucket, sumByBucketSeries, validateFilter,
-  type DashboardRole, type FilterState,
+  buildBuckets, clearWidgetConfigs, countInRange, dashboardTypeOf, exportMsg, exportReportFileName, fmtVN, inRange, isBoRole, isTchnccRole,
+  loadWidgetConfigs, resolveExportRange, resolveRange, saveWidgetConfigs, scopeByOrg, scopeByProvince, sumByBucket, sumByBucketSeries, validateExportFilter, validateFilter, validateWidgetName,
+  type DashboardRole, type ExportFilterState, type FilterState, type WidgetConfig, type WidgetWidth,
 } from "./config"
+
+// BR-07/8.3: chiều rộng widget → viewBox biểu đồ đường (px) để chữ/số scale hợp lý theo độ rộng thực tế.
+const chartPxWidth = (w: WidgetWidth) => (w === "30" ? 280 : w === "50" ? 420 : 760)
+
+interface WidgetDef { id: string; group: "card" | "chart"; defaultTitle: string; defaultWidth: WidgetWidth; render: (title: string, width: WidgetWidth) => React.ReactNode }
 
 export function DashboardPage() {
   const showToast = useToast()
   const [role, setRole] = useState<DashboardRole>("ld_btp")
   const bo = isBoRole(role)
   const tchncc = isTchnccRole(role)
+  const dashboardType = dashboardTypeOf(role)
   const [draft, setDraft] = useState<FilterState>(DEFAULT_FILTER)
   const [applied, setApplied] = useState<FilterState>(DEFAULT_FILTER)
   const [error, setError] = useState("")
@@ -91,11 +98,11 @@ export function DashboardPage() {
     { name: "CC điện tử trực tiếp", color: PALETTE[2], data: sumByBucket(gdccHieuLuc.filter((r) => r.phuongThuc === "CCĐT trực tiếp"), (r) => r.ngayCC, buckets) },
   ]
 
-  // Khai thác dữ liệu theo loại (B03 ở BTP, B04 ở STP) — scope theo `khaithac` đã tính ở trên.
+  // Khai thác dữ liệu theo loại — scope theo `khaithac` đã tính ở trên.
   const bKhaiThac = useToggle<"bar" | "pie">("bar", "pie")
   const khaiThacData = LOAI_DU_LIEU_KHAITHAC.map((l, i) => ({ label: l, value: countInRange(khaithac.filter((r) => r.loaiDuLieu === l), (r) => r.ngay, range.from, range.to), color: PALETTE[i % PALETTE.length] }))
 
-  // GDCC giấy theo thời gian — chỉ dùng ở STP (B03/UC355).
+  // GDCC giấy theo thời gian — dùng ở STP/TCHNCC.
   const bGiay = useToggle<"area" | "line">("area", "line")
   const giaySeries = [{ name: "Công chứng giấy", color: PALETTE[0], data: sumByBucket(gdccHieuLuc.filter((r) => r.phuongThuc === "Công chứng giấy"), (r) => r.ngayCC, buckets) }]
 
@@ -115,7 +122,7 @@ export function DashboardPage() {
   const b10 = useToggle<"line" | "stackedBar">("line", "stackedBar")
   const b10Series = sumByBucketSeries(nganchan.filter((r) => r.loai === "Thông tin ngăn chặn"), (r) => r.ngay, (r) => r.loaiTaiSan, LOAI_TAISAN_LIST, buckets).map((s, i) => ({ ...s, color: PALETTE[i % PALETTE.length] }))
 
-  // GDCC bị hủy / bị tuyên vô hiệu (B11+B12 ở BTP, B05+B06 ở STP) — cùng công thức, khác phạm vi đã scope ở `gdcc`.
+  // GDCC bị hủy / bị tuyên vô hiệu — cùng công thức, khác phạm vi đã scope ở `gdcc`.
   const bHuy = useToggle<"line" | "area">("line", "area")
   const huySeries = [{ name: "GDCC đã hủy", color: PALETTE[3], data: sumByBucket(gdcc.filter((r) => r.trangThai === "Đã hủy"), (r) => r.ngayCC, buckets) }]
   const bVoHieu = useToggle<"line" | "area">("line", "area")
@@ -133,12 +140,140 @@ export function DashboardPage() {
     }).sort((a, b) => b.total - a.total)
   }, [gdccHieuLuc, range])
 
+  const legendOf = (series: { name: string; color: string }[]) => series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)
+
+  /* ============================ A.7.4: DANH SÁCH WIDGET THEO CẤP DASHBOARD ============================ */
+  const widgetDefs: WidgetDef[] = useMemo(() => {
+    if (tchncc) {
+      return [
+        { id: "tc_card_hoso", group: "card", defaultTitle: "Hồ sơ công chứng", defaultWidth: "30", render: (title) => <StatCard label={title} value={c01Tchncc} icon={<FileText className="size-5" />} /> },
+        { id: "tc_card_vbccdt", group: "card", defaultTitle: "VBCC điện tử", defaultWidth: "30", render: (title) => <StatCard label={title} value={c02Tchncc} color="#7c3aed" bg="#f5f3ff" icon={<Building2 className="size-5" />} /> },
+        { id: "tc_card_luutru", group: "card", defaultTitle: "Hồ sơ lưu trữ điện tử", defaultWidth: "30", render: (title) => <StatCard label={title} value={c03Tchncc} color="#047857" bg="#ecfdf5" icon={<Archive className="size-5" />} /> },
+        { id: "tc_b01", group: "chart", defaultTitle: "Đối soát tra cứu thông tin (B01)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("DoiSoatTraCuu")} onToggle={bDoiSoat.toggle} toggleLabel={bDoiSoat.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}><LineOrArea categories={buckets.map((b) => b.label)} series={doiSoatSeries} mode={bDoiSoat.mode} yLabel="Số lượt tra cứu" width={chartPxWidth(w)} /></ChartCard> },
+        { id: "tc_b02", group: "chart", defaultTitle: "Phương thức giao dịch công chứng (B02)", defaultWidth: "50", render: (title) => <ChartCard title={title} onExport={() => doExport("PhuongThucGDCC")} onToggle={b01.toggle} toggleLabel={b01.mode === "pie" ? "Xem dạng cột" : "Xem dạng tròn"}><PieOrBar data={b01Data} mode={b01.mode} /></ChartCard> },
+        { id: "tc_b03", group: "chart", defaultTitle: "Thống kê giao dịch công chứng điện tử (B03)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("GDCCDienTu")} onToggle={b02.toggle} toggleLabel={b02.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"} legend={legendOf(b02Series)}><LineOrArea categories={buckets.map((b) => b.label)} series={b02Series} mode={b02.mode} yLabel="Số lượng GDCC điện tử" width={chartPxWidth(w)} /></ChartCard> },
+        { id: "tc_b04", group: "chart", defaultTitle: "Thống kê giao dịch công chứng giấy (B04)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("GDCCGiay")} onToggle={bGiay.toggle} toggleLabel={bGiay.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}><LineOrArea categories={buckets.map((b) => b.label)} series={giaySeries} mode={bGiay.mode} yLabel="Số lượng GDCC giấy" width={chartPxWidth(w)} /></ChartCard> },
+        { id: "tc_b05", group: "chart", defaultTitle: "Tình hình khai thác dữ liệu theo loại dữ liệu (B05)", defaultWidth: "50", render: (title) => <ChartCard title={title} onExport={() => doExport("KhaiThacTheoLoai")} onToggle={bKhaiThac.toggle} toggleLabel={bKhaiThac.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}><PieOrBar data={khaiThacData} mode={bKhaiThac.mode} /></ChartCard> },
+        { id: "tc_b06", group: "chart", defaultTitle: "Xu hướng giao dịch bị hủy (B06)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("XuHuongBiHuy")} onToggle={bHuy.toggle} toggleLabel={bHuy.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}><LineOrArea categories={buckets.map((b) => b.label)} series={huySeries} mode={bHuy.mode} yLabel="Số lượng GDCC bị hủy" width={chartPxWidth(w)} /></ChartCard> },
+        { id: "tc_b07", group: "chart", defaultTitle: "Yêu cầu khai thác chi tiết GDCC (B07)", defaultWidth: "100", render: (title, w) => <ChartCard title={title} onExport={() => doExport("YeuCauKhaiThac")} onToggle={bYeuCauKt.toggle} toggleLabel={bYeuCauKt.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"} legend={legendOf(yeuCauKtSeries)}><LineOrArea categories={buckets.map((b) => b.label)} series={yeuCauKtSeries} mode={bYeuCauKt.mode} yLabel="Số lượng yêu cầu khai thác" width={chartPxWidth(w)} /></ChartCard> },
+        { id: "tc_b08", group: "chart", defaultTitle: "Xu hướng giao dịch bị tuyên vô hiệu (B08)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("XuHuongVoHieu")} onToggle={bVoHieu.toggle} toggleLabel={bVoHieu.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}><LineOrArea categories={buckets.map((b) => b.label)} series={voHieuSeries} mode={bVoHieu.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={chartPxWidth(w)} /></ChartCard> },
+      ]
+    }
+    const common: WidgetDef[] = [
+      { id: "card_tchncc", group: "card", defaultTitle: "Tổ chức HNCC", defaultWidth: "30", render: (title) => <StatCard label={title} value={c01} icon={<Building2 className="size-5" />} /> },
+      { id: "card_ccv", group: "card", defaultTitle: "Công chứng viên", defaultWidth: "30", render: (title) => <StatCard label={title} value={c02} color="#7c3aed" bg="#f5f3ff" icon={<Users className="size-5" />} /> },
+      { id: "card_gdcc", group: "card", defaultTitle: "Giao dịch công chứng", defaultWidth: "30", render: (title) => <StatCard label={title} value={c03} color="#047857" bg="#ecfdf5" icon={<FileText className="size-5" />} /> },
+      { id: "card_nganchan", group: "card", defaultTitle: "Thông tin ngăn chặn", defaultWidth: "30", render: (title) => <StatCard label={title} value={c04} color="#b45309" bg="#fffbeb" icon={<ShieldAlert className="size-5" />} /> },
+      { id: "card_canhbao", group: "card", defaultTitle: "Cảnh báo rủi ro", defaultWidth: "30", render: (title) => <StatCard label={title} value={c05} color="#b91c1c" bg="#fef2f2" icon={<AlertTriangle className="size-5" />} /> },
+      { id: "b01_phuongthuc", group: "chart", defaultTitle: `Phương thức giao dịch công chứng (B01)`, defaultWidth: "50", render: (title) => <ChartCard title={title} onExport={() => doExport("PhuongThucGDCC")} onToggle={b01.toggle} toggleLabel={b01.mode === "pie" ? "Xem dạng cột" : "Xem dạng tròn"}><PieOrBar data={b01Data} mode={b01.mode} /></ChartCard> },
+      { id: "b02_dientu", group: "chart", defaultTitle: `Thống kê giao dịch công chứng điện tử (B02)`, defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("GDCCDienTu")} onToggle={b02.toggle} toggleLabel={b02.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"} legend={legendOf(b02Series)}><LineOrArea categories={buckets.map((b) => b.label)} series={b02Series} mode={b02.mode} yLabel="Số lượng GDCC điện tử" width={chartPxWidth(w)} /></ChartCard> },
+    ]
+    if (bo) {
+      return [
+        ...common,
+        { id: "b03_khaithac", group: "chart", defaultTitle: "Tình hình khai thác dữ liệu theo loại dữ liệu (B03)", defaultWidth: "50", render: (title) => <ChartCard title={title} onExport={() => doExport("KhaiThacTheoLoai")} onToggle={bKhaiThac.toggle} toggleLabel={bKhaiThac.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}><PieOrBar data={khaiThacData} mode={bKhaiThac.mode} /></ChartCard> },
+        { id: "b13_phanbo", group: "chart", defaultTitle: "Phân bố giao dịch công chứng theo địa phương (B13)", defaultWidth: "50", render: (title) => <ChartCard title={title} onExport={() => doExport("PhanBoDiaPhuong")} onToggle={b13.toggle} toggleLabel={b13.mode === "bar" ? "Xem bảng dữ liệu" : "Xem biểu đồ"}><HorizontalBarOrTable data={b13Data} mode={b13.mode} /></ChartCard> },
+        { id: "b07_donvi", group: "chart", defaultTitle: "Xu hướng khai thác dữ liệu theo đơn vị (B07)", defaultWidth: "100", render: (title, w) => <ChartCard title={title} onExport={() => doExport("XuHuongKhaiThacDonVi")} onToggle={b07.toggle} toggleLabel={b07.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"} legend={legendOf(b07Series)}><LineOrArea categories={buckets.map((b) => b.label)} series={b07Series} mode={b07.mode} yLabel="Số lượt khai thác" width={chartPxWidth(w)} /></ChartCard> },
+        { id: "b08_xuhuonggd", group: "chart", defaultTitle: "Xu hướng giao dịch theo thời gian (B08)", defaultWidth: "100", render: (title, w) => <ChartCard title={title} onExport={() => doExport("XuHuongGiaoDich")} onToggle={b08.toggle} toggleLabel={b08.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}><LineOrArea categories={buckets.map((b) => b.label)} series={b08Series} mode={b08.mode} yLabel="Tổng số GDCC" width={chartPxWidth(w)} /></ChartCard> },
+        { id: "b09_loaigd", group: "chart", defaultTitle: "Xu hướng giao dịch theo loại giao dịch (B09)", defaultWidth: "100", render: (title) => <ChartCard title={title} onExport={() => doExport("XuHuongTheoLoaiGD")} onToggle={b09.toggle} toggleLabel={b09.mode === "line" ? "Xem cột xếp chồng" : "Xem dạng đường"} legend={legendOf(b09Series)}><LineOrStackedBar categories={buckets.map((b) => b.label)} series={b09Series} mode={b09.mode} yLabel="Số lượng GDCC" /></ChartCard> },
+        { id: "b10_loaitaisan", group: "chart", defaultTitle: "Xu hướng ngăn chặn theo loại tài sản (B10)", defaultWidth: "100", render: (title) => <ChartCard title={title} onExport={() => doExport("XuHuongNganChan")} onToggle={b10.toggle} toggleLabel={b10.mode === "line" ? "Xem cột xếp chồng" : "Xem dạng đường"} legend={legendOf(b10Series)}><LineOrStackedBar categories={buckets.map((b) => b.label)} series={b10Series} mode={b10.mode} yLabel="Số lượng ngăn chặn" /></ChartCard> },
+        { id: "b11_biHuy", group: "chart", defaultTitle: "Xu hướng giao dịch bị hủy (B11)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("XuHuongBiHuy")} onToggle={bHuy.toggle} toggleLabel={bHuy.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}><LineOrArea categories={buckets.map((b) => b.label)} series={huySeries} mode={bHuy.mode} yLabel="Số lượng GDCC bị hủy" width={chartPxWidth(w)} /></ChartCard> },
+        { id: "b12_voHieu", group: "chart", defaultTitle: "Xu hướng giao dịch bị tuyên vô hiệu (B12)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("XuHuongVoHieu")} onToggle={bVoHieu.toggle} toggleLabel={bVoHieu.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}><LineOrArea categories={buckets.map((b) => b.label)} series={voHieuSeries} mode={bVoHieu.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={chartPxWidth(w)} /></ChartCard> },
+      ]
+    }
+    return [
+      ...common,
+      { id: "b03_giay", group: "chart", defaultTitle: "Thống kê giao dịch công chứng giấy (B03)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("GDCCGiay")} onToggle={bGiay.toggle} toggleLabel={bGiay.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}><LineOrArea categories={buckets.map((b) => b.label)} series={giaySeries} mode={bGiay.mode} yLabel="Số lượng GDCC giấy" width={chartPxWidth(w)} /></ChartCard> },
+      { id: "b04_khaithac", group: "chart", defaultTitle: "Tình hình khai thác dữ liệu theo loại dữ liệu (B04)", defaultWidth: "50", render: (title) => <ChartCard title={title} onExport={() => doExport("KhaiThacTheoLoai")} onToggle={bKhaiThac.toggle} toggleLabel={bKhaiThac.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}><PieOrBar data={khaiThacData} mode={bKhaiThac.mode} /></ChartCard> },
+      { id: "b05_biHuy", group: "chart", defaultTitle: "Xu hướng giao dịch bị hủy (B05)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("XuHuongBiHuy")} onToggle={bHuy.toggle} toggleLabel={bHuy.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}><LineOrArea categories={buckets.map((b) => b.label)} series={huySeries} mode={bHuy.mode} yLabel="Số lượng GDCC bị hủy" width={chartPxWidth(w)} /></ChartCard> },
+      { id: "b06_voHieu", group: "chart", defaultTitle: "Xu hướng giao dịch bị tuyên vô hiệu (B06)", defaultWidth: "50", render: (title, w) => <ChartCard title={title} onExport={() => doExport("XuHuongVoHieu")} onToggle={bVoHieu.toggle} toggleLabel={bVoHieu.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}><LineOrArea categories={buckets.map((b) => b.label)} series={voHieuSeries} mode={bVoHieu.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={chartPxWidth(w)} /></ChartCard> },
+    ]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tchncc, bo, c01, c02, c03, c04, c05, c01Tchncc, c02Tchncc, c03Tchncc, b01Data, b02Series, khaiThacData, giaySeries, doiSoatSeries, yeuCauKtSeries, b07Series, b08Series, b09Series, b10Series, huySeries, voHieuSeries, b13Data, buckets])
+
+  /* ============================ A.7.4: CẤU HÌNH HIỂN THỊ (BR-02/BR-03/BR-04/BR-05/BR-06/BR-07/BR-08) ============================ */
+  const [configs, setConfigs] = useState<Record<string, WidgetConfig>>({})
+  const [configOpen, setConfigOpen] = useState(false)
+  const [exportOpen, setExportOpen] = useState(false)
+  const [exportFilter, setExportFilter] = useState<ExportFilterState>({ preset: "Năm nay", tuNgay: "", denNgay: "", province: "Toàn quốc", format: "PDF" })
+
+  useEffect(() => {
+    const saved = loadWidgetConfigs(dashboardType)
+    const next: Record<string, WidgetConfig> = {}
+    widgetDefs.forEach((w, i) => { next[w.id] = saved?.[w.id] ?? { visible: true, customName: "", order: i, width: w.defaultWidth } })
+    setConfigs(next)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dashboardType])
+
+  useEffect(() => {
+    if (Object.keys(configs).length) saveWidgetConfigs(dashboardType, configs)
+  }, [configs, dashboardType])
+
+  const onToggleVisible = (id: string) => {
+    const cur = configs[id]
+    if (!cur) return
+    const visibleCount = Object.values(configs).filter((c) => c.visible).length
+    if (cur.visible && visibleCount <= 1) { showToast("Không thể ẩn toàn bộ widget. Vui lòng giữ ít nhất 1 widget hiển thị.", "error"); return }
+    setConfigs((prev) => ({ ...prev, [id]: { ...prev[id], visible: !prev[id].visible } }))
+    showToast("Đã cập nhật cấu hình.")
+  }
+  const onRename = (id: string, name: string): string => {
+    const err = validateWidgetName(name)
+    if (err) return err
+    setConfigs((prev) => ({ ...prev, [id]: { ...prev[id], customName: name } }))
+    showToast("Đã cập nhật cấu hình.")
+    return ""
+  }
+  const onWidthChange = (id: string, width: WidgetWidth) => {
+    setConfigs((prev) => ({ ...prev, [id]: { ...prev[id], width } }))
+    showToast("Đã cập nhật cấu hình.")
+  }
+  const onReorder = (dragId: string, dropId: string) => {
+    const ids = Object.keys(configs).sort((a, b) => configs[a].order - configs[b].order)
+    const from = ids.indexOf(dragId), to = ids.indexOf(dropId)
+    if (from < 0 || to < 0) return
+    ids.splice(to, 0, ids.splice(from, 1)[0])
+    setConfigs((prev) => {
+      const next = { ...prev }
+      ids.forEach((id, i) => { next[id] = { ...next[id], order: i } })
+      return next
+    })
+    showToast("Đã cập nhật cấu hình.")
+  }
+  const onRestoreDefault = () => {
+    clearWidgetConfigs(dashboardType)
+    const next: Record<string, WidgetConfig> = {}
+    widgetDefs.forEach((w, i) => { next[w.id] = { visible: true, customName: "", order: i, width: w.defaultWidth } })
+    setConfigs(next)
+    showToast("Đã khôi phục bố cục mặc định.")
+  }
+
+  const widgetMetas: WidgetMeta[] = widgetDefs.map((w) => ({ id: w.id, group: w.group, defaultTitle: w.defaultTitle }))
+  const orderedVisible = widgetDefs
+    .filter((w) => configs[w.id]?.visible ?? true)
+    .sort((a, b) => (configs[a.id]?.order ?? 0) - (configs[b.id]?.order ?? 0))
+  const gridItems = orderedVisible.map((w) => {
+    const width = configs[w.id]?.width ?? w.defaultWidth
+    return { id: w.id, width, node: w.render(configs[w.id]?.customName || w.defaultTitle, width) }
+  })
+
+  const doOpenExport = () => { setExportFilter((f) => ({ ...f, province: bo ? applied.province : "Toàn quốc" })); setExportOpen(true) }
+  const doExportReport = (f: ExportFilterState) => {
+    const err = validateExportFilter(f)
+    if (err) return
+    const r = exportMsg(gridItems.length)
+    const name = exportReportFileName(dashboardType, f.format)
+    showToast(r.kind === "ok" ? `Kết xuất báo cáo thành công (${name}).` : r.msg, r.kind)
+    setExportOpen(false)
+  }
+  const exportRangeLabel = useMemo(() => resolveExportRange(exportFilter).label, [exportFilter])
+
   return (
     <div className="space-y-4">
       <DashboardHeader role={role} onRole={setRole}
         actions={<>
-          <Button variant="outline" size="sm" onClick={() => showToast("Đang mở màn hình cấu hình hiển thị Dashboard…")}><Settings2 className="size-4" />Cấu hình</Button>
-          <Button variant="outline" size="sm" onClick={() => showToast("Đang mở dialog kết xuất báo cáo Dashboard…")}>Kết xuất báo cáo</Button>
+          <Button variant="outline" size="sm" onClick={() => setConfigOpen(true)}><Settings2 className="size-4" />Cấu hình</Button>
+          <Button variant="outline" size="sm" onClick={doOpenExport}>Kết xuất báo cáo</Button>
         </>} />
       <AccessGate role={role}>
         {!bo && !tchncc && (
@@ -203,124 +338,16 @@ export function DashboardPage() {
           <div className="mt-3 text-[11.5px] text-foreground-subtle">* Phát sinh trong kỳ: {fmtVN(range.from)} – {fmtVN(range.to)} (D-2)</div>
         </div>
 
-        {tchncc ? (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <StatCard label="Hồ sơ công chứng" value={c01Tchncc} icon={<FileText className="size-5" />} />
-            <StatCard label="VBCC điện tử" value={c02Tchncc} color="#7c3aed" bg="#f5f3ff" icon={<Building2 className="size-5" />} />
-            <StatCard label="Hồ sơ lưu trữ điện tử" value={c03Tchncc} color="#047857" bg="#ecfdf5" icon={<Archive className="size-5" />} />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <StatCard label="Tổ chức HNCC" value={c01} icon={<Building2 className="size-5" />} />
-            <StatCard label="Công chứng viên" value={c02} color="#7c3aed" bg="#f5f3ff" icon={<Users className="size-5" />} />
-            <StatCard label="Giao dịch công chứng" value={c03} color="#047857" bg="#ecfdf5" icon={<FileText className="size-5" />} />
-            <StatCard label="Thông tin ngăn chặn" value={c04} color="#b45309" bg="#fffbeb" icon={<ShieldAlert className="size-5" />} />
-            <StatCard label="Cảnh báo rủi ro" value={c05} color="#b91c1c" bg="#fef2f2" icon={<AlertTriangle className="size-5" />} />
-          </div>
-        )}
-
-        {tchncc && (
-          <ChartCard title="Đối soát tra cứu thông tin (B01)" onExport={() => doExport("DoiSoatTraCuu")} onToggle={bDoiSoat.toggle} toggleLabel={bDoiSoat.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-            <LineOrArea categories={buckets.map((b) => b.label)} series={doiSoatSeries} mode={bDoiSoat.mode} yLabel="Số lượt tra cứu" />
-          </ChartCard>
-        )}
-
-        <ChartCard title={`Phương thức giao dịch công chứng (${tchncc ? "B02" : "B01"})`} onExport={() => doExport("PhuongThucGDCC")} onToggle={b01.toggle} toggleLabel={b01.mode === "pie" ? "Xem dạng cột" : "Xem dạng tròn"}>
-          <PieOrBar data={b01Data} mode={b01.mode} />
-        </ChartCard>
-
-        <ChartCard title={`Thống kê giao dịch công chứng điện tử (${tchncc ? "B03" : "B02"})`} onExport={() => doExport("GDCCDienTu")} onToggle={b02.toggle} toggleLabel={b02.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}
-          legend={b02Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-          <LineOrArea categories={buckets.map((b) => b.label)} series={b02Series} mode={b02.mode} yLabel="Số lượng GDCC điện tử" />
-        </ChartCard>
-
-        {bo && (
-          <>
-            <ChartCard title="Tình hình khai thác dữ liệu theo loại dữ liệu (B03)" onExport={() => doExport("KhaiThacTheoLoai")} onToggle={bKhaiThac.toggle} toggleLabel={bKhaiThac.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}>
-              <PieOrBar data={khaiThacData} mode={bKhaiThac.mode} />
-            </ChartCard>
-
-            <ChartCard title="Phân bố giao dịch công chứng theo địa phương (B13)" onExport={() => doExport("PhanBoDiaPhuong")} onToggle={b13.toggle} toggleLabel={b13.mode === "bar" ? "Xem bảng dữ liệu" : "Xem biểu đồ"}>
-              <HorizontalBarOrTable data={b13Data} mode={b13.mode} />
-            </ChartCard>
-
-            <ChartCard title="Xu hướng khai thác dữ liệu theo đơn vị (B07)" onExport={() => doExport("XuHuongKhaiThacDonVi")} onToggle={b07.toggle} toggleLabel={b07.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}
-              legend={b07Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-              <LineOrArea categories={buckets.map((b) => b.label)} series={b07Series} mode={b07.mode} yLabel="Số lượt khai thác" />
-            </ChartCard>
-
-            <ChartCard title="Xu hướng giao dịch theo thời gian (B08)" onExport={() => doExport("XuHuongGiaoDich")} onToggle={b08.toggle} toggleLabel={b08.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-              <LineOrArea categories={buckets.map((b) => b.label)} series={b08Series} mode={b08.mode} yLabel="Tổng số GDCC" />
-            </ChartCard>
-
-            <ChartCard title="Xu hướng giao dịch theo loại giao dịch (B09)" onExport={() => doExport("XuHuongTheoLoaiGD")} onToggle={b09.toggle} toggleLabel={b09.mode === "line" ? "Xem cột xếp chồng" : "Xem dạng đường"}
-              legend={b09Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-              <LineOrStackedBar categories={buckets.map((b) => b.label)} series={b09Series} mode={b09.mode} yLabel="Số lượng GDCC" />
-            </ChartCard>
-
-            <ChartCard title="Xu hướng ngăn chặn theo loại tài sản (B10)" onExport={() => doExport("XuHuongNganChan")} onToggle={b10.toggle} toggleLabel={b10.mode === "line" ? "Xem cột xếp chồng" : "Xem dạng đường"}
-              legend={b10Series.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-              <LineOrStackedBar categories={buckets.map((b) => b.label)} series={b10Series} mode={b10.mode} yLabel="Số lượng ngăn chặn" />
-            </ChartCard>
-
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-              <ChartCard title="Xu hướng giao dịch bị hủy (B11)" onExport={() => doExport("XuHuongBiHuy")} onToggle={bHuy.toggle} toggleLabel={bHuy.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-                <LineOrArea categories={buckets.map((b) => b.label)} series={huySeries} mode={bHuy.mode} yLabel="Số lượng GDCC bị hủy" width={400} />
-              </ChartCard>
-              <ChartCard title="Xu hướng giao dịch bị tuyên vô hiệu (B12)" onExport={() => doExport("XuHuongVoHieu")} onToggle={bVoHieu.toggle} toggleLabel={bVoHieu.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-                <LineOrArea categories={buckets.map((b) => b.label)} series={voHieuSeries} mode={bVoHieu.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={400} />
-              </ChartCard>
-            </div>
-          </>
-        )}
-
-        {!bo && !tchncc && (
-          <>
-            <ChartCard title="Thống kê giao dịch công chứng giấy (B03)" onExport={() => doExport("GDCCGiay")} onToggle={bGiay.toggle} toggleLabel={bGiay.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}>
-              <LineOrArea categories={buckets.map((b) => b.label)} series={giaySeries} mode={bGiay.mode} yLabel="Số lượng GDCC giấy" />
-            </ChartCard>
-
-            <ChartCard title="Tình hình khai thác dữ liệu theo loại dữ liệu (B04)" onExport={() => doExport("KhaiThacTheoLoai")} onToggle={bKhaiThac.toggle} toggleLabel={bKhaiThac.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}>
-              <PieOrBar data={khaiThacData} mode={bKhaiThac.mode} />
-            </ChartCard>
-
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-              <ChartCard title="Xu hướng giao dịch bị hủy (B05)" onExport={() => doExport("XuHuongBiHuy")} onToggle={bHuy.toggle} toggleLabel={bHuy.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-                <LineOrArea categories={buckets.map((b) => b.label)} series={huySeries} mode={bHuy.mode} yLabel="Số lượng GDCC bị hủy" width={400} />
-              </ChartCard>
-              <ChartCard title="Xu hướng giao dịch bị tuyên vô hiệu (B06)" onExport={() => doExport("XuHuongVoHieu")} onToggle={bVoHieu.toggle} toggleLabel={bVoHieu.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-                <LineOrArea categories={buckets.map((b) => b.label)} series={voHieuSeries} mode={bVoHieu.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={400} />
-              </ChartCard>
-            </div>
-          </>
-        )}
-
-        {tchncc && (
-          <>
-            <ChartCard title="Thống kê giao dịch công chứng giấy (B04)" onExport={() => doExport("GDCCGiay")} onToggle={bGiay.toggle} toggleLabel={bGiay.mode === "area" ? "Xem dạng đường" : "Xem dạng vùng"}>
-              <LineOrArea categories={buckets.map((b) => b.label)} series={giaySeries} mode={bGiay.mode} yLabel="Số lượng GDCC giấy" />
-            </ChartCard>
-
-            <ChartCard title="Tình hình khai thác dữ liệu theo loại dữ liệu (B05)" onExport={() => doExport("KhaiThacTheoLoai")} onToggle={bKhaiThac.toggle} toggleLabel={bKhaiThac.mode === "bar" ? "Xem dạng tròn" : "Xem dạng cột"}>
-              <PieOrBar data={khaiThacData} mode={bKhaiThac.mode} />
-            </ChartCard>
-
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-              <ChartCard title="Xu hướng giao dịch bị hủy (B06)" onExport={() => doExport("XuHuongBiHuy")} onToggle={bHuy.toggle} toggleLabel={bHuy.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-                <LineOrArea categories={buckets.map((b) => b.label)} series={huySeries} mode={bHuy.mode} yLabel="Số lượng GDCC bị hủy" width={400} />
-              </ChartCard>
-              <ChartCard title="Xu hướng giao dịch bị tuyên vô hiệu (B08)" onExport={() => doExport("XuHuongVoHieu")} onToggle={bVoHieu.toggle} toggleLabel={bVoHieu.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}>
-                <LineOrArea categories={buckets.map((b) => b.label)} series={voHieuSeries} mode={bVoHieu.mode} yLabel="Số lượng GDCC bị tuyên vô hiệu" width={400} />
-              </ChartCard>
-            </div>
-
-            <ChartCard title="Yêu cầu khai thác chi tiết GDCC (B07)" onExport={() => doExport("YeuCauKhaiThac")} onToggle={bYeuCauKt.toggle} toggleLabel={bYeuCauKt.mode === "line" ? "Xem dạng vùng" : "Xem dạng đường"}
-              legend={yeuCauKtSeries.map((s) => <span key={s.name} className="flex items-center gap-1.5"><span className="size-2.5 rounded-full" style={{ background: s.color }} />{s.name}</span>)}>
-              <LineOrArea categories={buckets.map((b) => b.label)} series={yeuCauKtSeries} mode={bYeuCauKt.mode} yLabel="Số lượng yêu cầu khai thác" />
-            </ChartCard>
-          </>
-        )}
+        <WidgetGrid items={gridItems} />
       </AccessGate>
+
+      <ConfigPanel open={configOpen} onClose={() => setConfigOpen(false)} widgets={widgetMetas} configs={configs}
+        onToggleVisible={onToggleVisible} onRename={onRename} onWidthChange={onWidthChange} onReorder={onReorder}
+        onRestoreDefault={onRestoreDefault} onOpenExport={() => { setConfigOpen(false); doOpenExport() }} />
+
+      <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} dashboardType={dashboardType} showProvince={!tchncc}
+        filter={exportFilter} onChangeFilter={setExportFilter} previewItems={gridItems.map((it) => ({ id: it.id, title: it.id, node: it.node }))}
+        onExport={doExportReport} rangeLabel={exportRangeLabel} />
     </div>
   )
 }
