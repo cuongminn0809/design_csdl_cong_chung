@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Bell, Search } from "lucide-react"
+import { Search } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import { SUBSYSTEMS, type NavItem } from "@/config/nav"
 import { ALL_ROUTES } from "@/config/routes"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { onGlobalSearchFocusRequest } from "@/components/layout/globalSearch"
+import { NotiBell } from "@/features/notifications/NotiBell"
 
 function findBreadcrumb(items: NavItem[], pathname: string, trail: string[] = []): string[] | null {
   for (const item of items) {
@@ -102,9 +102,7 @@ export function Header() {
       </div>
 
       {/* Tài khoản hiển thị ở footer sidebar, không lặp lại ở header. */}
-      <Button variant="ghost" size="icon" aria-label="Thông báo">
-        <Bell className="size-4.5" />
-      </Button>
+      <NotiBell />
     </header>
   )
 }

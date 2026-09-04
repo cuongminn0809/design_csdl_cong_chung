@@ -86,6 +86,10 @@ import { FaqListPage } from "@/features/utilities/FaqListPage"
 import { RecentActivitiesPage } from "@/features/utilities/RecentActivitiesPage"
 import { PersonalHistoryPage } from "@/features/utilities/PersonalHistoryPage"
 import { PersonalSessionsPage } from "@/features/utilities/PersonalSessionsPage"
+import { NotiListPage } from "@/features/notifications/NotiListPage"
+import { SubscribePage } from "@/features/notifications/SubscribePage"
+import { DataFeedbackPage } from "@/features/notifications/DataFeedbackPage"
+import { ReportNotiListPage } from "@/features/notifications/ReportNotiListPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -124,6 +128,10 @@ const REAL_ROUTES = new Set([
   "/quan-tri/lich-su-ca-nhan",
   "/quan-tri/phien-dang-nhap-ca-nhan",
   "/dashboard/hoat-dong-gan-day",
+  "/tien-ich/thong-bao",
+  "/tien-ich/thong-bao/dang-ky-nhan",
+  "/tien-ich/thong-bao/phan-hoi-du-lieu",
+  "/tien-ich/thong-bao/dot-bao-cao",
 ])
 
 function App() {
@@ -229,6 +237,10 @@ function App() {
         <Route path="/tra-cuu/huong-dan-su-dung" element={<InstructionListPage />} />
         <Route path="/tra-cuu/huong-dan-su-dung/:id" element={<InstructionDetailPage />} />
         <Route path="/tra-cuu/faq" element={<FaqListPage />} />
+        <Route path="/tien-ich/thong-bao" element={<NotiListPage />} />
+        <Route path="/tien-ich/thong-bao/dang-ky-nhan" element={<SubscribePage />} />
+        <Route path="/tien-ich/thong-bao/phan-hoi-du-lieu" element={<DataFeedbackPage />} />
+        <Route path="/tien-ich/thong-bao/dot-bao-cao" element={<ReportNotiListPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

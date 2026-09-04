@@ -3,7 +3,7 @@ import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
   LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList, FileSpreadsheet, Landmark,
   Activity, Server, DownloadCloud, SprayCan, Wand2, GitMerge, SearchCheck, FileStack,
-  HelpCircle, UserRound, KeyRound, Wrench,
+  HelpCircle, UserRound, KeyRound, Wrench, Bell, MessageSquareWarning,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -348,6 +348,18 @@ export const SUBSYSTEMS: Subsystem[] = [
         icon: Wrench,
         children: [
           { type: "leaf", label: "Hoạt động gần đây", path: "/dashboard/hoat-dong-gan-day", icon: Activity },
+          {
+            type: "group",
+            label: "Thông báo",
+            path: "/tien-ich/thong-bao",
+            icon: Bell,
+            children: [
+              { type: "leaf", label: "Danh sách thông báo", path: "/tien-ich/thong-bao", icon: List },
+              { type: "leaf", label: "Đăng ký nhận thông báo", path: "/tien-ich/thong-bao/dang-ky-nhan", icon: Settings2 },
+              { type: "leaf", label: "Phản hồi xử lý dữ liệu", path: "/tien-ich/thong-bao/phan-hoi-du-lieu", icon: MessageSquareWarning },
+              { type: "leaf", label: "Thông báo đợt báo cáo", path: "/tien-ich/thong-bao/dot-bao-cao", icon: FileStack },
+            ],
+          },
         ],
       },
     ],
