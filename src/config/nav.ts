@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react"
 import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
   LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList, FileSpreadsheet, Landmark,
-  Activity, Server, DownloadCloud, SprayCan, Wand2, GitMerge, SearchCheck,
+  Activity, Server, DownloadCloud, SprayCan, Wand2, GitMerge, SearchCheck, FileStack,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -324,6 +324,15 @@ export const SUBSYSTEMS: Subsystem[] = [
               { type: "leaf", label: "Hậu kiểm dữ liệu", path: "/admin-report/data-postcheck", icon: SearchCheck },
             ],
           },
+          { type: "leaf", label: "Yêu cầu cung cấp dữ liệu", path: "/data-provide-request/stats", icon: FileStack },
+        ],
+      },
+      {
+        type: "group",
+        label: "Quản lý yêu cầu cung cấp dữ liệu",
+        icon: Inbox,
+        children: [
+          { type: "leaf", label: "Đăng ký yêu cầu cung cấp dữ liệu", path: "/data-provide-request", icon: Send },
         ],
       },
     ],

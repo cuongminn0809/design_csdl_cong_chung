@@ -76,6 +76,8 @@ import { DataNormalizationPage } from "@/features/adminReport/DataNormalizationP
 import { DataReconciliationPage } from "@/features/adminReport/DataReconciliationPage"
 import { DataPostcheckPage } from "@/features/adminReport/DataPostcheckPage"
 import { DashboardPage as BtpStpDashboardPage } from "@/features/dashboard/DashboardPage"
+import { DataProvideRequestListPage } from "@/features/dataProvideRequest/DataProvideRequestListPage"
+import { DataProvideRequestStatsPage } from "@/features/dataProvideRequest/DataProvideRequestStatsPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -113,7 +115,7 @@ const REAL_ROUTES = new Set([
 
 function App() {
   const placeholderRoutes = ALL_ROUTES.filter(
-    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !r.path.startsWith("/bao-cao-thong-ke") && !r.path.startsWith("/report-tt17") && !r.path.startsWith("/admin-report") && !REAL_ROUTES.has(r.path)
+    (r) => !r.path.startsWith("/doi-soat/") && !r.path.startsWith("/xu-ly/") && !r.path.startsWith("/notary-transaction/") && !r.path.startsWith("/prevent-info/") && !r.path.startsWith("/giai-toa-info/") && !r.path.startsWith("/exploit-info/") && !r.path.startsWith("/exploit/") && !r.path.startsWith("/tra-cuu/") && !r.path.startsWith("/reference-vbccdt") && !r.path.startsWith("/asset-exploit") && !r.path.startsWith("/khai-thac-thong-tin/") && !r.path.startsWith("/exploit-request") && !r.path.startsWith("/bao-cao-thong-ke") && !r.path.startsWith("/report-tt17") && !r.path.startsWith("/admin-report") && !r.path.startsWith("/data-provide-request") && !REAL_ROUTES.has(r.path)
   )
 
   return (
@@ -204,6 +206,8 @@ function App() {
         <Route path="/admin-report/data-reconciliation" element={<DataReconciliationPage />} />
         <Route path="/admin-report/data-postcheck" element={<DataPostcheckPage />} />
         <Route path="/dashboard" element={<BtpStpDashboardPage />} />
+        <Route path="/data-provide-request" element={<DataProvideRequestListPage />} />
+        <Route path="/data-provide-request/stats" element={<DataProvideRequestStatsPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}
