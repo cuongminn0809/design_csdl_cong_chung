@@ -27,8 +27,8 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
         to={item.path}
         className={({ isActive }) =>
           cn(
-            "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors",
-            "hover:bg-surface-muted",
+            "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm outline-none transition-colors",
+            "hover:bg-surface-muted focus-visible:ring-[3px] focus-visible:ring-ring/50",
             isActive
               ? "bg-neutral-900 text-neutral-50 font-medium hover:bg-neutral-900"
               : "text-foreground-muted"
@@ -54,7 +54,7 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
             className={({ isActive }) =>
               cn(
                 // paddingLeft đã áp dụng ở wrapper (dòng trên) — chỉ giữ pr-2.5 ở đây để tránh cộng dồn thụt lề.
-                "flex flex-1 items-center gap-2.5 rounded-md py-1.5 pr-2.5 text-sm font-medium transition-colors hover:bg-surface-muted",
+                "flex flex-1 items-center gap-2.5 rounded-md py-1.5 pr-2.5 text-sm font-medium outline-none transition-colors hover:bg-surface-muted focus-visible:ring-[3px] focus-visible:ring-ring/50",
                 isActive ? "bg-neutral-900 text-neutral-50 hover:bg-neutral-900" : active ? "text-foreground-strong" : "text-foreground-muted"
               )
             }
@@ -66,7 +66,7 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
             type="button"
             onClick={onToggle}
             aria-label={open ? "Thu gọn" : "Mở rộng"}
-            className="flex size-7 shrink-0 items-center justify-center rounded-md text-foreground-subtle transition-colors hover:bg-surface-muted"
+            className="flex size-7 shrink-0 items-center justify-center rounded-md text-foreground-subtle outline-none transition-colors hover:bg-surface-muted focus-visible:ring-[3px] focus-visible:ring-ring/50"
           >
             <ChevronRight className={cn("size-3.5 transition-transform", open && "rotate-90")} />
           </button>
@@ -76,7 +76,7 @@ function NavNode({ item, depth, open, onToggle }: { item: NavItem; depth: number
           type="button"
           onClick={onToggle}
           className={cn(
-            "flex w-full items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left text-sm font-medium transition-colors hover:bg-surface-muted",
+            "flex w-full items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left text-sm font-medium outline-none transition-colors hover:bg-surface-muted focus-visible:ring-[3px] focus-visible:ring-ring/50",
             active ? "text-foreground-strong" : "text-foreground-muted"
           )}
           style={{ paddingLeft: 10 + depth * 14 }}
