@@ -168,16 +168,7 @@ export const SUBSYSTEMS: Subsystem[] = [
     code: "csdlcc",
     label: "Cơ sở dữ liệu công chứng",
     nav: [
-      { type: "leaf", label: "Tiện ích", path: "/tien-ich", icon: Wrench },
-      {
-        type: "group",
-        label: "Dashboard tổng hợp",
-        path: "/dashboard",
-        icon: LayoutDashboard,
-        children: [
-          { type: "leaf", label: "Hoạt động gần đây", path: "/dashboard/hoat-dong-gan-day", icon: Activity },
-        ],
-      },
+      { type: "leaf", label: "Dashboard tổng hợp", path: "/dashboard", icon: LayoutDashboard },
       {
         type: "group",
         label: "Quản lý giao dịch công chứng",
@@ -348,6 +339,15 @@ export const SUBSYSTEMS: Subsystem[] = [
         icon: Inbox,
         children: [
           { type: "leaf", label: "Đăng ký yêu cầu cung cấp dữ liệu", path: "/data-provide-request", icon: Send },
+        ],
+      },
+      {
+        type: "group",
+        label: "Tiện ích",
+        path: "/tien-ich",
+        icon: Wrench,
+        children: [
+          { type: "leaf", label: "Hoạt động gần đây", path: "/dashboard/hoat-dong-gan-day", icon: Activity },
         ],
       },
     ],
