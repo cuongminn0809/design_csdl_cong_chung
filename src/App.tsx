@@ -94,6 +94,12 @@ import { NotiTypeListPage } from "@/features/notiConfig/NotiTypeListPage"
 import { NotiGroupListPage } from "@/features/notiConfig/NotiGroupListPage"
 import { PersonalSettingsPage } from "@/features/notiConfig/PersonalSettingsPage"
 import { AdminNotiComposePage } from "@/features/notiConfig/AdminNotiComposePage"
+import { OrgListPage as TchnccOrgListPage } from "@/features/orgManagement/OrgListPage"
+import { OrgHistoryPage as TchnccOrgHistoryPage } from "@/features/orgManagement/OrgHistoryPage"
+import { OrgFormPage as TchnccOrgFormPage } from "@/features/orgManagement/OrgFormPage"
+import { OrgDetailPage as TchnccOrgDetailPage } from "@/features/orgManagement/OrgDetailPage"
+import { StatsProvincePage } from "@/features/orgManagement/StatsProvincePage"
+import { StatsNationwidePage } from "@/features/orgManagement/StatsNationwidePage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -140,6 +146,8 @@ const REAL_ROUTES = new Set([
   "/quan-ly-cau-hinh/cau-hinh-thong-bao/nhom-thong-tin",
   "/quan-ly-cau-hinh/cau-hinh-thong-bao/cai-dat-nhan",
   "/quan-ly-cau-hinh/cau-hinh-thong-bao/tao-thong-bao",
+  "/quan-ly-thong-tin/to-chuc-hncc",
+  "/quan-ly-thong-tin/to-chuc-hncc/lich-su-cap-nhat",
 ])
 
 function App() {
@@ -223,6 +231,8 @@ function App() {
         <Route path="/bao-cao-thong-ke/ngan-chan-cbrr/thong-ke" element={<NganChanReportPage />} />
         <Route path="/bao-cao-thong-ke/ngan-chan-cbrr/tinh-hinh-khai-thac" element={<KhaiThacReportPage />} />
         <Route path="/bao-cao-thong-ke/doi-soat-lich-su-tra-cuu" element={<DoiSoatTraCuuPage />} />
+        <Route path="/bao-cao-thong-ke/tchncc/dia-ban" element={<StatsProvincePage />} />
+        <Route path="/bao-cao-thong-ke/tchncc/toan-quoc" element={<StatsNationwidePage />} />
         <Route path="/report-tt17/ministry" element={<MinistryReportPage />} />
         <Route path="/report-tt17/department" element={<DepartmentReportPage />} />
         <Route path="/report-tt17/notary-org" element={<NotaryOrgReportPage />} />
@@ -253,6 +263,11 @@ function App() {
         <Route path="/quan-ly-cau-hinh/cau-hinh-thong-bao/nhom-thong-tin" element={<NotiGroupListPage />} />
         <Route path="/quan-ly-cau-hinh/cau-hinh-thong-bao/cai-dat-nhan" element={<PersonalSettingsPage />} />
         <Route path="/quan-ly-cau-hinh/cau-hinh-thong-bao/tao-thong-bao" element={<AdminNotiComposePage />} />
+        <Route path="/quan-ly-thong-tin/to-chuc-hncc" element={<TchnccOrgListPage />} />
+        <Route path="/quan-ly-thong-tin/to-chuc-hncc/lich-su-cap-nhat" element={<TchnccOrgHistoryPage />} />
+        <Route path="/quan-ly-thong-tin/to-chuc-hncc/them-moi" element={<TchnccOrgFormPage mode="create" />} />
+        <Route path="/quan-ly-thong-tin/to-chuc-hncc/:id/chinh-sua" element={<TchnccOrgFormPage mode="edit" />} />
+        <Route path="/quan-ly-thong-tin/to-chuc-hncc/:id" element={<TchnccOrgDetailPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}

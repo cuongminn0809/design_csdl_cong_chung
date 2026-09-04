@@ -3,7 +3,7 @@ import {
   Building2, CheckCheck, Database, FileClock, FileSignature, FileText, FileX2, HardDriveDownload, History, Inbox,
   LayoutDashboard, LayoutGrid, List, MessageCircle, RefreshCw, ScrollText, Settings2, Ban, ShieldAlert, ShieldCheck, ShieldOff, SlidersHorizontal, Trash2, Users, Workflow, Search, QrCode, Boxes, Send, BarChart3, PieChart, Scale, AlertTriangle, GitCompare, ClipboardList, FileSpreadsheet, Landmark,
   Activity, Server, DownloadCloud, SprayCan, Wand2, GitMerge, SearchCheck, FileStack,
-  HelpCircle, UserRound, KeyRound, Wrench, Bell, MessageSquareWarning, Layers,
+  HelpCircle, UserRound, KeyRound, Wrench, Bell, MessageSquareWarning, Layers, Globe,
 } from "lucide-react"
 
 export interface DataGroup {
@@ -241,6 +241,23 @@ export const SUBSYSTEMS: Subsystem[] = [
       },
       {
         type: "group",
+        label: "Quản lý thông tin",
+        icon: Building2,
+        defaultOpen: true,
+        children: [
+          {
+            type: "group",
+            label: "Tổ chức hành nghề công chứng",
+            path: "/quan-ly-thong-tin/to-chuc-hncc",
+            icon: Building2,
+            children: [
+              { type: "leaf", label: "Lịch sử cập nhật", path: "/quan-ly-thong-tin/to-chuc-hncc/lich-su-cap-nhat", icon: History },
+            ],
+          },
+        ],
+      },
+      {
+        type: "group",
         label: "Tra cứu thông tin",
         icon: Search,
         defaultOpen: true,
@@ -322,6 +339,15 @@ export const SUBSYSTEMS: Subsystem[] = [
             ],
           },
           { type: "leaf", label: "Đối soát lịch sử tra cứu", path: "/bao-cao-thong-ke/doi-soat-lich-su-tra-cuu", icon: ClipboardList },
+          {
+            type: "group",
+            label: "Thông tin TCHNCC",
+            icon: Building2,
+            children: [
+              { type: "leaf", label: "Trên địa bàn tỉnh/thành phố", path: "/bao-cao-thong-ke/tchncc/dia-ban", icon: BarChart3 },
+              { type: "leaf", label: "Trên cả nước", path: "/bao-cao-thong-ke/tchncc/toan-quoc", icon: Globe },
+            ],
+          },
           {
             type: "group",
             label: "BC kết quả HĐCC theo TT17",
