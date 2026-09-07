@@ -114,6 +114,7 @@ import { SignAlertSettingPage } from "@/features/signManagement/SignAlertSetting
 import { SignReportRegistrationPage } from "@/features/signManagement/SignReportRegistrationPage"
 import { SignReportLocalUsagePage } from "@/features/signManagement/SignReportLocalUsagePage"
 import { SignReportExpiredPage } from "@/features/signManagement/SignReportExpiredPage"
+import { TchnccExploitLogPage } from "@/features/exploitLog/TchnccExploitLogPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -151,6 +152,7 @@ const REAL_ROUTES = new Set([
   "/quan-tri/ho-so-tai-khoan",
   "/quan-tri/lich-su-ca-nhan",
   "/quan-tri/phien-dang-nhap-ca-nhan",
+  "/lich-su-he-thong/khai-thac-tchncc",
   "/dashboard/hoat-dong-gan-day",
   "/tien-ich/thong-bao",
   "/tien-ich/thong-bao/dang-ky-nhan",
@@ -275,6 +277,7 @@ function App() {
         <Route path="/quan-tri/ho-so-tai-khoan" element={<AccountProfilePage />} />
         <Route path="/quan-tri/lich-su-ca-nhan" element={<PersonalHistoryPage />} />
         <Route path="/quan-tri/phien-dang-nhap-ca-nhan" element={<PersonalSessionsPage />} />
+        <Route path="/lich-su-he-thong/khai-thac-tchncc" element={<TchnccExploitLogPage />} />
         <Route path="/tra-cuu/huong-dan-su-dung" element={<InstructionListPage />} />
         <Route path="/tra-cuu/huong-dan-su-dung/:id" element={<InstructionDetailPage />} />
         <Route path="/tra-cuu/faq" element={<FaqListPage />} />

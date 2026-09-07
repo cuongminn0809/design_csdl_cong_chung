@@ -164,6 +164,14 @@ export const SUBSYSTEMS: Subsystem[] = [
       },
       {
         type: "group",
+        label: "Quản lý lịch sử hệ thống",
+        icon: FileClock,
+        children: [
+          { type: "leaf", label: "Tra cứu lịch sử khai thác thông tin TCHNCC", path: "/lich-su-he-thong/khai-thac-tchncc", icon: FileClock },
+        ],
+      },
+      {
+        type: "group",
         label: "Quản lý cấu hình",
         icon: Settings2,
         children: [
