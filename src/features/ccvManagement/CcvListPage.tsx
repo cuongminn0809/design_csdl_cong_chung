@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { Download, Eye, History, Pencil, Plus, Search, UserRound, XCircle } from "lucide-react"
+import { Download, Eye, History, Pencil, Plus, RefreshCw, Search, UserRound } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
@@ -101,13 +101,13 @@ export function CcvListPage() {
                   <table className="w-full table-fixed border-collapse text-sm">
                     <thead><tr className="border-b border-border bg-neutral-50">
                       <Th className="w-11 text-center">STT</Th>
-                      <Th className="w-[18%]">Họ và tên</Th>
-                      <Th className="w-[11%]">Số thẻ</Th>
-                      <Th className="w-[20%]">Tổ chức công chứng</Th>
-                      <Th className="w-[14%]">Sở tư pháp</Th>
-                      <Th className="w-[21%]">Địa chỉ trụ sở</Th>
-                      <Th className="w-[140px]">Trạng thái</Th>
-                      <Th className="w-[160px] text-right">Hành động</Th>
+                      <Th className="w-[16%]">Họ và tên</Th>
+                      <Th className="w-[10%]">Số thẻ</Th>
+                      <Th className="w-[17%]">Tổ chức công chứng</Th>
+                      <Th className="w-[11%]">Sở tư pháp</Th>
+                      <Th className="w-[17%]">Địa chỉ trụ sở</Th>
+                      <Th className="w-[130px]">Trạng thái</Th>
+                      <Th className="w-[210px] text-right">Hành động</Th>
                     </tr></thead>
                     <tbody>{paged.map((c, i) => {
                       const badge = ccvStatusMeta(c.trangThai)
@@ -123,12 +123,12 @@ export function CcvListPage() {
                           <td className="truncate px-4 py-3 text-foreground-muted">{c.soTuPhap}</td>
                           <td className="truncate px-4 py-3 text-foreground-muted" title={orgAddressOf(c.toChucCongChungId) ?? undefined}>{orgAddressOf(c.toChucCongChungId) ?? "—"}</td>
                           <td className="px-4 py-3"><span className="inline-flex rounded-full px-2 py-0.5 text-[11.5px] font-medium" style={{ background: badge.bg, color: badge.fg }}>{c.trangThai}</span></td>
-                          <td className="px-4 py-3">
-                            <div className="flex justify-end gap-1.5">
-                              <Button variant="outline" size="sm" onClick={() => navigate(`/quan-ly-thong-tin/cong-chung-vien/${c.id}`)}><Eye className="size-3.5" /></Button>
-                              {canManage && <Button variant="outline" size="sm" onClick={() => navigate(`/quan-ly-thong-tin/cong-chung-vien/${c.id}/chinh-sua`)}><Pencil className="size-3.5" /></Button>}
-                              {canManage && c.trangThai !== "Thu hồi thẻ" && <Button variant="outline" size="sm" onClick={() => setChangingStatus(c)}><XCircle className="size-3.5" /></Button>}
-                              {canViewHistory(role) && <Button variant="outline" size="sm" onClick={() => navigate(`/quan-ly-thong-tin/cong-chung-vien/lich-su-cap-nhat?ccv=${c.id}`)}><History className="size-3.5" /></Button>}
+                          <td className="px-3 py-3">
+                            <div className="flex flex-wrap justify-end gap-1.5">
+                              <Button variant="outline" size="sm" title="Xem chi tiết" onClick={() => navigate(`/quan-ly-thong-tin/cong-chung-vien/${c.id}`)}><Eye className="size-3.5" /></Button>
+                              {canManage && <Button variant="outline" size="sm" title="Chỉnh sửa" onClick={() => navigate(`/quan-ly-thong-tin/cong-chung-vien/${c.id}/chinh-sua`)}><Pencil className="size-3.5" /></Button>}
+                              {canManage && c.trangThai !== "Thu hồi thẻ" && <Button variant="outline" size="sm" title="Chuyển trạng thái" onClick={() => setChangingStatus(c)}><RefreshCw className="size-3.5" /></Button>}
+                              {canViewHistory(role) && <Button variant="outline" size="sm" title="Lịch sử cập nhật" onClick={() => navigate(`/quan-ly-thong-tin/cong-chung-vien/lich-su-cap-nhat?ccv=${c.id}`)}><History className="size-3.5" /></Button>}
                             </div>
                           </td>
                         </tr>
