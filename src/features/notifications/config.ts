@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react"
 
 /* ============================ VAI TRÒ (demo, dùng chung 1 store để Bell và các trang đồng bộ) ============================ */
-export type NotiRole = "ld_btp" | "cv_btp" | "ld_cuc_bttp" | "ld_stp" | "cv_stp" | "ld_tchncc"
+export type NotiRole = "ld_btp" | "cv_btp" | "ld_cuc_bttp" | "ld_stp" | "cv_stp" | "ld_tchncc" | "ccv" | "qths"
 export const NOTI_ROLES: { key: NotiRole; label: string }[] = [
   { key: "ld_btp", label: "Lãnh đạo Bộ Tư pháp" },
   { key: "cv_btp", label: "Chuyên viên BTP" },
@@ -9,6 +9,8 @@ export const NOTI_ROLES: { key: NotiRole; label: string }[] = [
   { key: "ld_stp", label: "Lãnh đạo phòng chuyên môn STP" },
   { key: "cv_stp", label: "Chuyên viên Sở Tư pháp" },
   { key: "ld_tchncc", label: "Lãnh đạo TCHNCC" },
+  { key: "ccv", label: "Công chứng viên" },
+  { key: "qths", label: "Quản trị hệ thống" },
 ]
 export const roleLabel = (r: NotiRole) => NOTI_ROLES.find((x) => x.key === r)?.label ?? r
 
@@ -23,6 +25,7 @@ export const canManageReportNoti = (r: NotiRole) => r === "cv_stp" || r === "ld_
 export const CURRENT_ORG_USER: Record<NotiRole, string> = {
   ld_btp: "Nguyễn Thị Bộ", cv_btp: "Trần Văn Chuyên", ld_cuc_bttp: "Phạm Văn Cục",
   ld_stp: "Vũ Thị Sở", cv_stp: "Lê Văn Viên", ld_tchncc: "Hoàng Văn Trưởng",
+  ccv: "Nguyễn Văn A", qths: "Quản trị viên hệ thống",
 }
 
 /* ============================ NGÀY DEMO CỐ ĐỊNH ============================ */

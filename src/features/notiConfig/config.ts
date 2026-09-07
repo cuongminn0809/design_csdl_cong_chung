@@ -92,7 +92,7 @@ export interface PersonalSettings { rows: PersonalSettingRow[]; pause: PauseConf
 const DEFAULT_ROW = (loaiThongBaoId: string): PersonalSettingRow => ({ loaiThongBaoId, phanMem: true, email: false, tanSuat: "Ngay lập tức", gioBatDau: "00:00", gioKetThuc: "23:59" })
 const DEFAULT_PAUSE: PauseConfig = { enabled: false, scope: "all", selectedTypeIds: [], tuNgay: "", denNgay: "" }
 
-const HAS_EMAIL: Record<NotiRole, boolean> = { ld_btp: true, cv_btp: true, ld_cuc_bttp: true, ld_stp: true, cv_stp: true, ld_tchncc: false }
+const HAS_EMAIL: Record<NotiRole, boolean> = { ld_btp: true, cv_btp: true, ld_cuc_bttp: true, ld_stp: true, cv_stp: true, ld_tchncc: false, ccv: false, qths: true }
 export const accountHasEmail = (r: NotiRole) => HAS_EMAIL[r]
 
 let personalSettings: Record<NotiRole, PersonalSettings> = {
@@ -102,6 +102,8 @@ let personalSettings: Record<NotiRole, PersonalSettings> = {
   ld_stp: { rows: [{ ...DEFAULT_ROW("lt-01") }, { ...DEFAULT_ROW("lt-02"), email: true }, { ...DEFAULT_ROW("lt-03"), tanSuat: "Hàng ngày", gioBatDau: "08:00", gioKetThuc: "18:00" }], pause: DEFAULT_PAUSE },
   cv_stp: { rows: [DEFAULT_ROW("lt-01"), DEFAULT_ROW("lt-02"), DEFAULT_ROW("lt-03")], pause: DEFAULT_PAUSE },
   ld_tchncc: { rows: [DEFAULT_ROW("lt-01"), DEFAULT_ROW("lt-02"), DEFAULT_ROW("lt-03")], pause: { enabled: true, scope: "selected", selectedTypeIds: ["lt-01"], tuNgay: "2026-08-25", denNgay: "2026-09-05" } },
+  ccv: { rows: [DEFAULT_ROW("lt-01"), DEFAULT_ROW("lt-02")], pause: DEFAULT_PAUSE },
+  qths: { rows: [DEFAULT_ROW("lt-01"), DEFAULT_ROW("lt-02"), DEFAULT_ROW("lt-03")], pause: DEFAULT_PAUSE },
 }
 const settingsListeners = new Set<() => void>()
 const emitSettings = () => { personalSettings = { ...personalSettings }; settingsListeners.forEach((l) => l()) }

@@ -178,6 +178,7 @@ export const SUBSYSTEMS: Subsystem[] = [
               { type: "leaf", label: "Tạo thông báo", path: "/quan-ly-cau-hinh/cau-hinh-thong-bao/tao-thong-bao", icon: Send },
             ],
           },
+          { type: "leaf", label: "Thiết lập cơ chế quản lý thông tin chữ ký số", path: "/quan-ly-cau-hinh/thiet-lap-co-che-quan-ly-thong-tin-chu-ky-so", icon: KeyRound },
         ],
       },
     ],
@@ -237,6 +238,23 @@ export const SUBSYSTEMS: Subsystem[] = [
           { type: "leaf", label: "Thông tin ngăn chặn", path: "/prevent-info/search", icon: SlidersHorizontal },
           { type: "leaf", label: "Thông tin giải tỏa", path: "/giai-toa-info/search", icon: ShieldOff },
           { type: "leaf", label: "Quản lý quy trình", path: "/prevent-info/workflow", icon: Workflow },
+        ],
+      },
+      {
+        type: "group",
+        label: "CCV và TCHNCC",
+        icon: KeyRound,
+        defaultOpen: true,
+        children: [
+          {
+            type: "group",
+            label: "Thông tin chữ ký số",
+            icon: KeyRound,
+            defaultOpen: true,
+            children: [
+              { type: "leaf", label: "Quản lý thông tin đăng ký chữ ký số", path: "/ccv-tchncc/thong-tin-chu-ky-so", icon: FileSignature },
+            ],
+          },
         ],
       },
       {
@@ -364,6 +382,16 @@ export const SUBSYSTEMS: Subsystem[] = [
             children: [
               { type: "leaf", label: "Trên địa bàn tỉnh/thành phố", path: "/bao-cao-thong-ke/ccv/dia-ban", icon: BarChart3 },
               { type: "leaf", label: "Trên cả nước", path: "/bao-cao-thong-ke/ccv/toan-quoc", icon: Globe },
+            ],
+          },
+          {
+            type: "group",
+            label: "Chữ ký số của CCV và TCHNCC",
+            icon: KeyRound,
+            children: [
+              { type: "leaf", label: "Báo cáo đăng ký chữ ký số", path: "/bao-cao-thong-ke/chu-ky-so-ccv-tchncc", icon: BarChart3 },
+              { type: "leaf", label: "Phân tích theo địa phương", path: "/bao-cao-thong-ke/chu-ky-so-ccv-tchncc/phan-tich-dia-phuong", icon: PieChart },
+              { type: "leaf", label: "Chữ ký số hết hạn theo kỳ", path: "/bao-cao-thong-ke/chu-ky-so-ccv-tchncc/het-han-theo-ky", icon: AlertTriangle },
             ],
           },
           {

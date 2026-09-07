@@ -106,6 +106,14 @@ import { CcvFormPage } from "@/features/ccvManagement/CcvFormPage"
 import { CcvDetailPage as CcvMgmtDetailPage } from "@/features/ccvManagement/CcvDetailPage"
 import { CcvStatsProvincePage } from "@/features/ccvManagement/CcvStatsProvincePage"
 import { CcvStatsNationwidePage } from "@/features/ccvManagement/CcvStatsNationwidePage"
+import { SignListPage } from "@/features/signManagement/SignListPage"
+import { SignDetailPage } from "@/features/signManagement/SignDetailPage"
+import { SignFormPage } from "@/features/signManagement/SignFormPage"
+import { SignApproveListPage } from "@/features/signManagement/SignApproveListPage"
+import { SignAlertSettingPage } from "@/features/signManagement/SignAlertSettingPage"
+import { SignReportRegistrationPage } from "@/features/signManagement/SignReportRegistrationPage"
+import { SignReportLocalUsagePage } from "@/features/signManagement/SignReportLocalUsagePage"
+import { SignReportExpiredPage } from "@/features/signManagement/SignReportExpiredPage"
 
 function ReconciliationRoute() {
   const { dataGroup } = useParams()
@@ -156,6 +164,8 @@ const REAL_ROUTES = new Set([
   "/quan-ly-thong-tin/to-chuc-hncc/lich-su-cap-nhat",
   "/quan-ly-thong-tin/cong-chung-vien",
   "/quan-ly-thong-tin/cong-chung-vien/lich-su-cap-nhat",
+  "/ccv-tchncc/thong-tin-chu-ky-so",
+  "/quan-ly-cau-hinh/thiet-lap-co-che-quan-ly-thong-tin-chu-ky-so",
 ])
 
 function App() {
@@ -243,6 +253,9 @@ function App() {
         <Route path="/bao-cao-thong-ke/tchncc/toan-quoc" element={<StatsNationwidePage />} />
         <Route path="/bao-cao-thong-ke/ccv/dia-ban" element={<CcvStatsProvincePage />} />
         <Route path="/bao-cao-thong-ke/ccv/toan-quoc" element={<CcvStatsNationwidePage />} />
+        <Route path="/bao-cao-thong-ke/chu-ky-so-ccv-tchncc" element={<SignReportRegistrationPage />} />
+        <Route path="/bao-cao-thong-ke/chu-ky-so-ccv-tchncc/phan-tich-dia-phuong" element={<SignReportLocalUsagePage />} />
+        <Route path="/bao-cao-thong-ke/chu-ky-so-ccv-tchncc/het-han-theo-ky" element={<SignReportExpiredPage />} />
         <Route path="/report-tt17/ministry" element={<MinistryReportPage />} />
         <Route path="/report-tt17/department" element={<DepartmentReportPage />} />
         <Route path="/report-tt17/notary-org" element={<NotaryOrgReportPage />} />
@@ -273,6 +286,7 @@ function App() {
         <Route path="/quan-ly-cau-hinh/cau-hinh-thong-bao/nhom-thong-tin" element={<NotiGroupListPage />} />
         <Route path="/quan-ly-cau-hinh/cau-hinh-thong-bao/cai-dat-nhan" element={<PersonalSettingsPage />} />
         <Route path="/quan-ly-cau-hinh/cau-hinh-thong-bao/tao-thong-bao" element={<AdminNotiComposePage />} />
+        <Route path="/quan-ly-cau-hinh/thiet-lap-co-che-quan-ly-thong-tin-chu-ky-so" element={<SignAlertSettingPage />} />
         <Route path="/quan-ly-thong-tin/to-chuc-hncc" element={<TchnccOrgListPage />} />
         <Route path="/quan-ly-thong-tin/to-chuc-hncc/lich-su-cap-nhat" element={<TchnccOrgHistoryPage />} />
         <Route path="/quan-ly-thong-tin/to-chuc-hncc/them-moi" element={<TchnccOrgFormPage mode="create" />} />
@@ -283,6 +297,12 @@ function App() {
         <Route path="/quan-ly-thong-tin/cong-chung-vien/them-moi" element={<CcvFormPage mode="create" />} />
         <Route path="/quan-ly-thong-tin/cong-chung-vien/:id/chinh-sua" element={<CcvFormPage mode="edit" />} />
         <Route path="/quan-ly-thong-tin/cong-chung-vien/:id" element={<CcvMgmtDetailPage />} />
+        <Route path="/ccv-tchncc/thong-tin-chu-ky-so" element={<SignListPage />} />
+        <Route path="/ccv-tchncc/thong-tin-chu-ky-so/cho-phe-duyet" element={<SignApproveListPage />} />
+        <Route path="/ccv-tchncc/thong-tin-chu-ky-so/dang-ky-tchncc" element={<SignFormPage mode="create-org" />} />
+        <Route path="/ccv-tchncc/thong-tin-chu-ky-so/dang-ky-ccv" element={<SignFormPage mode="create-notary" />} />
+        <Route path="/ccv-tchncc/thong-tin-chu-ky-so/:id/cap-nhat" element={<SignFormPage mode="edit" />} />
+        <Route path="/ccv-tchncc/thong-tin-chu-ky-so/:id" element={<SignDetailPage />} />
         {placeholderRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={<Placeholder title={route.label} />} />
         ))}
