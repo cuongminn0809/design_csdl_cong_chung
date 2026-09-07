@@ -254,6 +254,15 @@ export const SUBSYSTEMS: Subsystem[] = [
               { type: "leaf", label: "Lịch sử cập nhật", path: "/quan-ly-thong-tin/to-chuc-hncc/lich-su-cap-nhat", icon: History },
             ],
           },
+          {
+            type: "group",
+            label: "Công chứng viên",
+            path: "/quan-ly-thong-tin/cong-chung-vien",
+            icon: UserRound,
+            children: [
+              { type: "leaf", label: "Lịch sử cập nhật", path: "/quan-ly-thong-tin/cong-chung-vien/lich-su-cap-nhat", icon: History },
+            ],
+          },
         ],
       },
       {
@@ -346,6 +355,15 @@ export const SUBSYSTEMS: Subsystem[] = [
             children: [
               { type: "leaf", label: "Trên địa bàn tỉnh/thành phố", path: "/bao-cao-thong-ke/tchncc/dia-ban", icon: BarChart3 },
               { type: "leaf", label: "Trên cả nước", path: "/bao-cao-thong-ke/tchncc/toan-quoc", icon: Globe },
+            ],
+          },
+          {
+            type: "group",
+            label: "Thông tin CCV",
+            icon: UserRound,
+            children: [
+              { type: "leaf", label: "Trên địa bàn tỉnh/thành phố", path: "/bao-cao-thong-ke/ccv/dia-ban", icon: BarChart3 },
+              { type: "leaf", label: "Trên cả nước", path: "/bao-cao-thong-ke/ccv/toan-quoc", icon: Globe },
             ],
           },
           {
