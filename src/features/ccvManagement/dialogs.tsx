@@ -29,6 +29,14 @@ function Field({ label, value }: { label: string; value?: React.ReactNode }) {
   return <div className="flex flex-col gap-0.5 border-b border-neutral-100 py-2.5"><div className="text-xs text-foreground-muted">{label}</div><div className="text-[13.5px] leading-snug text-foreground">{value || "—"}</div></div>
 }
 
+export function ConfirmDialog({ title, message, confirmLabel, onCancel, onConfirm }: { title: string; message: string; confirmLabel?: string; onCancel: () => void; onConfirm: () => void }) {
+  return (
+    <Modal title={title} onClose={onCancel} footer={<><Button variant="outline" onClick={onCancel}>Đóng lại</Button><Button onClick={onConfirm}>{confirmLabel ?? "Xác nhận"}</Button></>}>
+      <p className="text-[13.5px] leading-relaxed text-foreground">{message}</p>
+    </Modal>
+  )
+}
+
 export function CcvHistoryDetailDialog({ entry, onClose }: { entry: CcvHistoryEntry; onClose: () => void }) {
   return (
     <Modal title="Chi tiết lần thay đổi" wide onClose={onClose} footer={<Button variant="outline" onClick={onClose}>Đóng</Button>}>

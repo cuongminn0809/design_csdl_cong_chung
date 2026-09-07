@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/features/reconciliation/components/Toast"
 import { NativeSelect } from "@/features/reconciliation/components/NativeSelect"
 import { useCurrentRole } from "@/features/notifications/config"
+import { ConfirmDialog } from "./dialogs"
 import {
   CCV_STATUS_OPTIONS, CURRENT_ORG_USER, GENDERS, NATIONALITIES, ORG_HOME_PROVINCE, PROVINCES_34, activeOrgsIn,
   canManageCcv, createCcv, emptyCert, getCcv, orgAddressOf, updateCcv, useOrgs, wardsOf,
@@ -59,15 +60,23 @@ export function CcvFormPage({ mode }: { mode: "create" | "edit" }) {
   const [laTruongVanPhong, setLaTruongVanPhong] = useState(src?.laTruongVanPhong ?? false)
   const [cert, setCert] = useState<CcvCertificate>(src?.certificate ?? emptyCert())
   const [error, setError] = useState("")
+  const [confirmingCancel, setConfirmingCancel] = useState(false)
 
   const soTuPhap = src?.soTuPhap ?? ORG_HOME_PROVINCE
   const orgs = activeOrgsIn(soTuPhap, allOrgs)
 
-  const doCancel = () => {
-    if (window.confirm(mode === "create" ? "Dữ liệu đã nhập chưa được lưu. Bạn có chắc chắn muốn hủy thao tác?" : "Dữ liệu đã thay đổi chưa được lưu. Bạn có chắc chắn muốn hủy thao tác?")) {
-      navigate(mode === "create" ? "/quan-ly-thong-tin/cong-chung-vien" : `/quan-ly-thong-tin/cong-chung-vien/${id}`)
-    }
-  }
+  const dirty = mode === "create"
+    ? !!(hoTen || ngaySinh || danToc || sdt || email || soGiayTo || ngayCapGiayTo || noiCapGiayTo || diaChiThuongTru || phuongXa || toChucCongChungId || soThe || cert.soChungChi)
+    : !!src && (
+      hoTen !== src.hoTen || ngaySinh !== (src.ngaySinh ?? "") || gioiTinh !== src.gioiTinh || quocTich !== src.quocTich ||
+      danToc !== (src.danToc ?? "") || sdt !== (src.sdt ?? "") || email !== src.email || diaChiThuongTru !== src.diaChiThuongTru ||
+      tinhThanh !== src.tinhThanh || phuongXa !== src.phuongXa || trangThai !== src.trangThai ||
+      toChucCongChungId !== (src.toChucCongChungId ?? "") || soThe !== (src.soThe ?? "") || laTruongVanPhong !== src.laTruongVanPhong ||
+      JSON.stringify(cert) !== JSON.stringify(src.certificate)
+    )
+
+  const goToParent = () => navigate(mode === "create" ? "/quan-ly-thong-tin/cong-chung-vien" : `/quan-ly-thong-tin/cong-chung-vien/${id}`)
+  const doCancel = () => { if (dirty) setConfirmingCancel(true); else goToParent() }
 
   const validateStep1 = (): string | null => {
     if (!hoTen.trim()) return "Họ và tên là bắt buộc và không được vượt quá 250 ký tự."
@@ -226,6 +235,16 @@ export function CcvFormPage({ mode }: { mode: "create" | "edit" }) {
           </div>
         </div>
       </div>
+
+      {confirmingCancel && (
+        <ConfirmDialog
+          title="Xác nhận hủy thao tác"
+          message={mode === "create" ? "Dữ liệu đã nhập chưa được lưu. Bạn có chắc chắn muốn hủy thao tác?" : "Dữ liệu đã thay đổi chưa được lưu. Bạn có chắc chắn muốn hủy thao tác?"}
+          confirmLabel="Hủy thao tác"
+          onCancel={() => setConfirmingCancel(false)}
+          onConfirm={goToParent}
+        />
+      )}
     </div>
   )
 }
