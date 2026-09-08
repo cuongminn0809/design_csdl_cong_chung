@@ -77,22 +77,23 @@ export function ResourceBar({ label, pct, warnAt }: { label: string; pct: number
 /* ============================ BIỂU ĐỒ ĐƯỜNG (diễn biến theo thời gian) ============================ */
 export function LineChart({ labels, data, empty }: { labels: string[]; data: number[]; empty?: boolean }) {
   if (empty || !data.length) return <div className="flex h-[180px] items-center justify-center text-[13px] text-foreground-subtle">Không có dữ liệu</div>
-  const W = 760, H = 200, pad = 32
-  const max = Math.max(...data) * 1.08 || 1
+  const W = 760, H = 220, padTop = 26, padBottom = 30, padX = 36
+  const max = Math.max(...data) * 1.15 || 1
   const min = Math.min(0, Math.min(...data) * 0.92)
   const n = data.length
-  const x = (i: number) => pad + (i * (W - pad * 2)) / (n - 1 || 1)
-  const y = (v: number) => H - pad - ((v - min) / (max - min || 1)) * (H - pad * 2)
+  const x = (i: number) => padX + (i * (W - padX * 2)) / (n - 1 || 1)
+  const y = (v: number) => H - padBottom - ((v - min) / (max - min || 1)) * (H - padTop - padBottom)
   const pts = data.map((v, i) => `${x(i)},${y(v)}`).join(" ")
-  const area = `${pad},${H - pad} ${pts} ${x(n - 1)},${H - pad}`
+  const area = `${padX},${H - padBottom} ${pts} ${x(n - 1)},${H - padBottom}`
   const step = Math.max(1, Math.ceil(n / 7))
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full">
-      {[0, 0.25, 0.5, 0.75, 1].map((f, i) => <line key={i} x1={pad} x2={W - pad} y1={pad + f * (H - pad * 2)} y2={pad + f * (H - pad * 2)} stroke="#f1f5f9" strokeWidth={1} />)}
+      {[0, 0.25, 0.5, 0.75, 1].map((f, i) => <line key={i} x1={padX} x2={W - padX} y1={padTop + f * (H - padTop - padBottom)} y2={padTop + f * (H - padTop - padBottom)} stroke="#f1f5f9" strokeWidth={1} />)}
       <polygon points={area} fill="rgba(37,99,235,0.08)" />
       <polyline points={pts} fill="none" stroke="#2563eb" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-      {data.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={3} fill="#fff" stroke="#2563eb" strokeWidth={2}><title>{`${labels[i]}: ${v.toLocaleString("vi-VN")}`}</title></circle>)}
-      {labels.map((l, i) => (i % step === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize={9} fill="#a3a3a3">{l}</text>)}
+      {data.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={3.5} fill="#fff" stroke="#2563eb" strokeWidth={2.5}><title>{`${labels[i]}: ${v.toLocaleString("vi-VN")}`}</title></circle>)}
+      {data.map((v, i) => <text key={`v${i}`} x={x(i)} y={y(v) - 10} textAnchor="middle" fontSize={12} fontWeight={600} fill="#404040">{v.toLocaleString("vi-VN")}</text>)}
+      {labels.map((l, i) => (i % step === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize={13} fill="#737373">{l}</text>)}
     </svg>
   )
 }
