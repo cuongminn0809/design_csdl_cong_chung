@@ -340,6 +340,8 @@ export const SUBSYSTEMS: Subsystem[] = [
             children: [
               { type: "leaf", label: "Danh sách yêu cầu đã gửi", path: "/exploit-request/sent", icon: Send },
               { type: "leaf", label: "Danh sách yêu cầu nhận được", path: "/exploit-request/received", icon: Inbox },
+              { type: "leaf", label: "Lịch sử xem chi tiết", path: "/exploit-request/history", icon: History },
+              { type: "leaf", label: "Thống kê yêu cầu", path: "/exploit-request/stats", icon: BarChart3 },
             ],
           },
         ],

@@ -56,6 +56,8 @@ import { HauKiemDashboardPage } from "@/features/haukiem/HauKiemDashboardPage"
 import { HauKiemListPage } from "@/features/haukiem/HauKiemListPage"
 import { SentPage } from "@/features/exploitreq/SentPage"
 import { ReceivedPage } from "@/features/exploitreq/ReceivedPage"
+import { HistoryPage as ExploitRequestHistoryPage } from "@/features/exploitreq/HistoryPage"
+import { StatsPage as ExploitRequestStatsPage } from "@/features/exploitreq/StatsPage"
 import { TongHopSoLuongPage } from "@/features/report/TongHopSoLuongPage"
 import { CanhBaoBatThuongPage } from "@/features/report/CanhBaoBatThuongPage"
 import { SaiLechPage } from "@/features/report/SaiLechPage"
@@ -243,6 +245,8 @@ function App() {
         <Route path="/khai-thac-thong-tin/hau-kiem-du-lieu/danh-sach" element={<HauKiemListPage />} />
         <Route path="/exploit-request/sent" element={<SentPage />} />
         <Route path="/exploit-request/received" element={<ReceivedPage />} />
+        <Route path="/exploit-request/history" element={<ExploitRequestHistoryPage />} />
+        <Route path="/exploit-request/stats" element={<ExploitRequestStatsPage />} />
         <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/tong-hop-so-luong" element={<TongHopSoLuongPage />} />
         <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/bao-cao-canh-bao-bat-thuong-tru-cap-ho-so-luu-tru" element={<CanhBaoBatThuongPage />} />
         <Route path="/bao-cao-thong-ke/giao-dich-cong-chung/bao-cao-du-lieu-sai-lech" element={<SaiLechPage />} />
