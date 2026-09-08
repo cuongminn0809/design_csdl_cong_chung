@@ -105,16 +105,16 @@ export function LineChart({ labels, data, empty, yLabel, xLabel, color = "#2563e
       {ticks.map((t, i) => (
         <g key={i}>
           <line x1={padLeft} x2={W - padRight} y1={y(t)} y2={y(t)} stroke="#eef0f3" strokeWidth={1} />
-          <text x={padLeft - 10} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize={15} fontWeight={600} fill="#71717a">{t.toLocaleString("vi-VN")}</text>
+          <text x={padLeft - 10} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize={12.5} fontWeight={600} fill="#71717a">{t.toLocaleString("vi-VN")}</text>
         </g>
       ))}
       <polygon points={area} fill={color} fillOpacity={0.1} />
-      <polyline points={pts} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {data.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={5} fill="#fff" stroke={color} strokeWidth={3}><title>{`${labels[i]}: ${v.toLocaleString("vi-VN")}`}</title></circle>)}
-      {data.map((v, i) => <text key={`v${i}`} x={x(i)} y={y(v) - 14} textAnchor="middle" fontSize={16} fontWeight={700} fill="#18181b">{v.toLocaleString("vi-VN")}</text>)}
-      {labels.map((l, i) => (i % labelStep === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - padBottom + 24} textAnchor="middle" fontSize={15} fontWeight={600} fill="#52525b">{l}</text>)}
-      {yLabel && <text x={4} y={padTop - 16} fontSize={14} fontWeight={600} fill="#71717a">{yLabel}</text>}
-      {xLabel && <text x={(padLeft + W - padRight) / 2} y={H - 4} textAnchor="middle" fontSize={14} fontWeight={600} fill="#71717a">{xLabel}</text>}
+      <polyline points={pts} fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      {data.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r={4} fill="#fff" stroke={color} strokeWidth={2.5}><title>{`${labels[i]}: ${v.toLocaleString("vi-VN")}`}</title></circle>)}
+      {data.map((v, i) => <text key={`v${i}`} x={x(i)} y={y(v) - 12} textAnchor="middle" fontSize={13} fontWeight={700} fill="#18181b">{v.toLocaleString("vi-VN")}</text>)}
+      {labels.map((l, i) => (i % labelStep === 0 || i === n - 1) && <text key={i} x={x(i)} y={H - padBottom + 22} textAnchor="middle" fontSize={12.5} fontWeight={600} fill="#52525b">{l}</text>)}
+      {yLabel && <text x={4} y={padTop - 14} fontSize={12} fontWeight={600} fill="#71717a">{yLabel}</text>}
+      {xLabel && <text x={(padLeft + W - padRight) / 2} y={H - 4} textAnchor="middle" fontSize={12} fontWeight={600} fill="#71717a">{xLabel}</text>}
     </svg>
   )
 }
