@@ -187,7 +187,7 @@ export function PreventListPage() {
                     <Th>Số VB đến</Th>
                     <Th>Ngày VB đến</Th>
                     <Th className="min-w-[150px]">Ngày tạo</Th>
-                    {external && <Th className="min-w-[130px]">Trạng thái</Th>}
+                    <Th className="min-w-[130px]">Trạng thái</Th>
                     {central && <Th className="min-w-[140px]">Tỉnh/Thành phố</Th>}
                     <Th className="min-w-[176px] text-center">Thao tác</Th>
                   </tr>
@@ -206,7 +206,7 @@ export function PreventListPage() {
                       <td className="px-4 py-3 font-mono text-[12px] text-foreground-muted">{r.soVanBanDen}</td>
                       <td className="whitespace-nowrap px-4 py-3 tabular-nums text-foreground-muted">{r.ngayVanBanDen}</td>
                       <td className="whitespace-nowrap px-4 py-3 text-[12.5px] tabular-nums text-foreground-muted">{r.createdAt}</td>
-                      {external && <td className="px-4 py-3"><StatusPill meta={PREVENT_STATUS[r.trangThai]} /></td>}
+                      <td className="px-4 py-3"><StatusPill meta={PREVENT_STATUS[r.trangThai]} /></td>
                       {central && <td className="px-4 py-3 text-[13px] text-foreground-muted">{r.tinhThanhPho}</td>}
                       <td className="whitespace-nowrap px-4 py-3" onClick={(e) => e.stopPropagation()}>
                         <div className="flex flex-nowrap items-center justify-center gap-0.5">
